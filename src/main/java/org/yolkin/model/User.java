@@ -4,22 +4,23 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-@Entity
-@Table(name = "users")
+//@Entity
+//@Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+//    @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(
-            mappedBy = "user",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL
-    )
-    @JoinColumn(name = "event_id", nullable = false)
+//    @OneToMany(
+//            mappedBy = "users",
+//            targetEntity = Event.class,
+//            fetch = FetchType.LAZY,
+//            cascade = CascadeType.ALL
+//    )
+//    @JoinColumn(name = "event_id", nullable = false)
     private List<Event> events;
 
     public User() {

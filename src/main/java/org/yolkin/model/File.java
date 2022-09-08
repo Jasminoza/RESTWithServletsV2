@@ -17,9 +17,6 @@ public class File {
     @Column(name = "date_of_uploading")
     private Date dateOfUploading;
 
-    @OneToOne (mappedBy = "event")
-    private Event event;
-
     public File() {
     }
 
@@ -45,13 +42,5 @@ public class File {
 
     public void setDateOfUploading(Date dateOfUploading) {
         this.dateOfUploading = dateOfUploading;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
     }
 }

@@ -3,29 +3,45 @@ package org.yolkin.servlet;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.yolkin.model.Event;
+import org.yolkin.model.File;
+import org.yolkin.repository.EventRepository;
+import org.yolkin.repository.FileRepository;
+import org.yolkin.repository.UserRepository;
+import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
+import org.yolkin.repository.hibernate.HibernateFileRepositoryImpl;
+import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 public class FileUploadServlet extends HttpServlet {
-
+    private final FileRepository fileRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
     static final int fileMaxSize = 100 * 1024;
     static final int memMaxSize = 100 * 1024;
 
+    public FileUploadServlet() {
+        fileRepository = new HibernateFileRepositoryImpl();
+        userRepository = new HibernateUserRepositoryImpl();
+        eventRepository = new HibernateEventRepositoryImpl();
+    }
+
     private String filePath = "src/main/resources/uploads/";
-    private File file;
+    private java.io.File file;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try (PrintWriter writer = response.getWriter()) {
             response.setContentType("text/html");
 
             DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-            diskFileItemFactory.setRepository(new File(filePath));
+            diskFileItemFactory.setRepository(new java.io.File(filePath));
             diskFileItemFactory.setSizeThreshold(memMaxSize);
 
             ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
@@ -50,13 +66,26 @@ public class FileUploadServlet extends HttpServlet {
 
                     String fileName = fileItem.getName();
                     if (fileName.lastIndexOf("\\") >= 0) {
-                        file = new File(filePath +
+                        file = new java.io.File(filePath +
                                 fileName.substring(fileName.lastIndexOf("\\")));
                     } else {
-                        file = new File(filePath +
+                        file = new java.io.File(filePath +
                                 fileName.substring(fileName.lastIndexOf("\\") + 1));
                     }
                     fileItem.write(file);
+
+                    File newFile = new File();
+                    newFile.setName(fileName);
+                    newFile.setDateOfUploading(new Date());
+                    newFile = fileRepository.create(newFile);
+
+//                    Long userId = Long.parseLong(request.getHeader("user_id"));
+//
+//                    Event event = new Event();
+//                    event.setFile(newFile);
+//                    event.setUser(userRepository.getById(userId));
+//
+//                    eventRepository.create(event);
 
                     writer.println(fileName + " is uploaded.<br>");
                     writer.println("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
