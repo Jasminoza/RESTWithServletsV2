@@ -19,4 +19,39 @@ public class File {
 
     @OneToOne (mappedBy = "event")
     private Event event;
+
+    public File() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getDateOfUploading() {
+        return dateOfUploading;
+    }
+
+    public void setDateOfUploading(Date dateOfUploading) {
+        this.dateOfUploading = dateOfUploading;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
 }
