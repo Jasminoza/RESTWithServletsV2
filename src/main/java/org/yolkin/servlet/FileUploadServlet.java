@@ -3,7 +3,6 @@ package org.yolkin.servlet;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.yolkin.model.Event;
 import org.yolkin.model.File;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
@@ -34,7 +33,7 @@ public class FileUploadServlet extends HttpServlet {
     }
 
     private String filePath = "src/main/resources/uploads/";
-    private java.io.File file;
+    private java.io.File realFile;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try (PrintWriter writer = response.getWriter()) {
@@ -66,23 +65,23 @@ public class FileUploadServlet extends HttpServlet {
 
                     String fileName = fileItem.getName();
                     if (fileName.lastIndexOf("\\") >= 0) {
-                        file = new java.io.File(filePath +
+                        realFile = new java.io.File(filePath +
                                 fileName.substring(fileName.lastIndexOf("\\")));
                     } else {
-                        file = new java.io.File(filePath +
+                        realFile = new java.io.File(filePath +
                                 fileName.substring(fileName.lastIndexOf("\\") + 1));
                     }
-                    fileItem.write(file);
+                    fileItem.write(realFile);
 
-                    File newFile = new File();
-                    newFile.setName(fileName);
-                    newFile.setDateOfUploading(new Date());
-                    newFile = fileRepository.create(newFile);
+                    File fileAtDB = new File();
+                    fileAtDB.setName(fileName);
+                    fileAtDB.setDateOfUploading(new Date());
+                    fileAtDB = fileRepository.create(fileAtDB);
 
 //                    Long userId = Long.parseLong(request.getHeader("user_id"));
 //
 //                    Event event = new Event();
-//                    event.setFile(newFile);
+//                    event.setFile(fileAtDB);
 //                    event.setUser(userRepository.getById(userId));
 //
 //                    eventRepository.create(event);
