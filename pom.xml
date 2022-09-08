@@ -11,6 +11,12 @@
   <properties>
     <javax.servlet.api.version>2.5</javax.servlet.api.version>
     <tomcat.plugin.version>2.2</tomcat.plugin.version>
+    <flyway.version>9.2.2</flyway.version>
+    <typesafeConfig.version>1.2.0</typesafeConfig.version>
+    <mysql.version>8.0.30</mysql.version>
+    <fileuploads.version>1.4</fileuploads.version>
+    <hibernate.version>6.1.2.Final</hibernate.version>
+    <maven.plugin.version>3.10.1</maven.plugin.version>
   </properties>
 
   <dependencies>
@@ -20,6 +26,36 @@
       <artifactId>servlet-api</artifactId>
       <version>${javax.servlet.api.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.typesafe</groupId>
+      <artifactId>config</artifactId>
+      <version>${typesafeConfig.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>${fileuploads.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>${hibernate.version}</version>
     </dependency>
 
   </dependencies>
@@ -32,6 +68,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.plugin.version}</version>
         <configuration>
           <source>11</source>
           <target>11</target>

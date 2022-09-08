@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>FileUpload</title>
+    </head>
+
+    <body>
+        <h1>File Upload</h1>
+        <h3>Please, select file to upload (max size is 100 kb)</h3> <br/>
+            <form action="FileUploadServlet" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" size="100"/><br/>
+                <input type="submit" value="Upload File"/>
+            </form> <br/>
+        <a href="/index.jsp">Go to main page</a>
+    </body>
+</html>
