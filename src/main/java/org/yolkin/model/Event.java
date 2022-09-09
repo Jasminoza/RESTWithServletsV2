@@ -1,6 +1,6 @@
 package org.yolkin.model;
 
-import jakarta.persistence.*;
+import java.util.List;
 
 //@Entity
 //@Table(name = "events")
@@ -8,25 +8,25 @@ public class Event {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    @Column (name = "event_id")
-    private Long id;
+    private Long eventId;
 
 //    @OneToOne (cascade = CascadeType.ALL)
 //    @JoinColumn (name = "file_id" , referencedColumnName = "id")
     private File file;
 
 //    @ManyToOne
-//    @JoinColumn (name = "user_id", nullable = false)
-    private User user;
+//    @JoinColumn (name = "user_id")
+    private List<User> users;
 
     public Event() {
     }
 
-    public Long getId() {
-        return id;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setEventId(Long id) {
+        this.eventId = id;
     }
 
     public File getFile() {
@@ -37,11 +37,11 @@ public class Event {
         this.file = file;
     }
 
-    public User getUser() {
-        return user;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }

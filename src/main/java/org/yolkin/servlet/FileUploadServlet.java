@@ -3,6 +3,7 @@ package org.yolkin.servlet;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.yolkin.model.Event;
 import org.yolkin.model.File;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
@@ -82,7 +83,7 @@ public class FileUploadServlet extends HttpServlet {
 //
 //                    Event event = new Event();
 //                    event.setFile(fileAtDB);
-//                    event.setUser(userRepository.getById(userId));
+//                    event.setUsers(userRepository.getById(userId));
 //
 //                    eventRepository.create(event);
 
