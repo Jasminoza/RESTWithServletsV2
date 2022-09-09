@@ -36,7 +36,7 @@ public class FileUploadServlet extends HttpServlet {
         eventRepository = new HibernateEventRepositoryImpl();
     }
 
-    private String filePath = "src/main/resources/uploads/";
+    private String filePath = "src/main/webapp/uploads/";
     private java.io.File realFile;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

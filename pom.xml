@@ -9,7 +9,7 @@
   <url>http://maven.apache.org</url>
 
   <properties>
-    <javax.servlet.api.version>2.5</javax.servlet.api.version>
+    <javax.servlet.api.version>4.0.1</javax.servlet.api.version>
     <tomcat.plugin.version>2.2</tomcat.plugin.version>
     <flyway.version>9.2.2</flyway.version>
     <typesafeConfig.version>1.2.0</typesafeConfig.version>
@@ -23,7 +23,7 @@
 
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <version>${javax.servlet.api.version}</version>
       <scope>provided</scope>
     </dependency>
