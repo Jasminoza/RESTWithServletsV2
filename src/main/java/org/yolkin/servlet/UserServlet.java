@@ -42,6 +42,7 @@ public class UserServlet extends HttpServlet {
             stringBuilder.append("<h1>User details</h1>");
 
             if (user == null) {
+                response.setStatus(400);
                 stringBuilder.append("User not found");
             } else {
                 stringBuilder.append("User ID: " + user.getId());
@@ -107,14 +108,15 @@ public class UserServlet extends HttpServlet {
             try {
                 userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
             } catch (Exception e) {
+                response.setStatus(400);
                 stringBuilder.append("Incorrect user id.");
                 writer.println(stringBuilder);
                 return;
             }
 
-            if (usernameFromRequest.isBlank() || userIdFromRequest == 0L) {
+            if (usernameFromRequest.isBlank()) {
                 response.setStatus(400);
-                stringBuilder.append("Empty username or user id.");
+                stringBuilder.append("Empty username");
                 writer.println(stringBuilder);
                 return;
             }
@@ -154,7 +156,44 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    public void doDelete(HttpServletRequest request, HttpServletResponse response) {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try (PrintWriter writer = response.getWriter()) {
+            StringBuilder stringBuilder = new StringBuilder();
 
+            Long userIdFromRequest;
+            try {
+                userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
+            } catch (Exception e) {
+                response.setStatus(400);
+                stringBuilder.append("Incorrect user id.");
+                writer.println(stringBuilder);
+                return;
+            }
+
+            User user = userRepository.getById(userIdFromRequest);
+
+            if (user == null) {
+                response.setStatus(400);
+                stringBuilder.append("User not found.");
+                writer.println(stringBuilder);
+                return;
+            }
+
+            userRepository.delete(userIdFromRequest);
+
+            stringBuilder.append("<!DOCTYPE = html>");
+            stringBuilder.append("<html>");
+            stringBuilder.append("<head><title>");
+            stringBuilder.append("<h1>User details</h1>");
+            stringBuilder.append("</title></head>");
+
+            stringBuilder.append("<body>");
+            stringBuilder.append("<h1>User was deleted successfully</h1>");
+
+            stringBuilder.append("</body>");
+            stringBuilder.append("</html>");
+
+            writer.println(stringBuilder);
+        }
     }
 }
