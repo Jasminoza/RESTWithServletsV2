@@ -81,7 +81,7 @@ public class FileServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         try (PrintWriter writer = response.getWriter()) {
-            response.setContentType("text/html");
+            StringBuilder stringBuilder = new StringBuilder();
 
             DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
             diskFileItemFactory.setRepository(new java.io.File(PATH_FOR_UPLOADING));
@@ -94,14 +94,11 @@ public class FileServlet extends HttpServlet {
 
             Iterator<FileItem> iterator = fileItems.iterator();
 
-            writer.println(
-                    "<!DOCTYPE html>" +
-                            "<html>" +
-                            "<head>" +
-                            "<title> File Uploading  </title>" +
-                            "</head>" +
-                            "<body>"
-            );
+            stringBuilder.append("<!DOCTYPE = html>");
+            stringBuilder.append("<html>");
+            stringBuilder.append("<head><title>");
+            stringBuilder.append("<h1>File details</h1>");
+            stringBuilder.append("</title></head>");
 
             while (iterator.hasNext()) {
                 FileItem fileItem = iterator.next();
@@ -125,18 +122,18 @@ public class FileServlet extends HttpServlet {
                     fileAtDB.setDateOfUploading(date);
                     fileAtDB = fileRepository.create(fileAtDB);
 
-                    writer.println(fileAtDB.getName() + " is uploaded.<br>");
-                    writer.println("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
-                    writer.println("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
+                    stringBuilder.append("<body>");
+                    stringBuilder.append("<h1>File " + fileAtDB.getName() + " was saved successfully</h1>");
+                    stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
+                    stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
+                    stringBuilder.append("<br/>");
 
+                    stringBuilder.append("</body>");
+                    stringBuilder.append("</html>");
+
+                    writer.println(stringBuilder);
                 }
             }
-
-            writer.println(
-                    "</body>" +
-                            "</html>"
-            );
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

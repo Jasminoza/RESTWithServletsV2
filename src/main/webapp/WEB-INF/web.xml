@@ -10,10 +10,6 @@
     <servlet-class>org.yolkin.servlet.DatabaseDemo</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>FileUploadServlet</servlet-name>
-    <servlet-class>org.yolkin.servlet.FileUploadServlet</servlet-class>
-  </servlet>
 
   <servlet>
     <servlet-name>Users</servlet-name>
@@ -39,11 +35,6 @@
   <servlet-mapping>
     <servlet-name>DatabaseDemo</servlet-name>
     <url-pattern>/DatabaseDemo</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>FileUploadServlet</servlet-name>
-    <url-pattern>/FileUploadServlet</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
