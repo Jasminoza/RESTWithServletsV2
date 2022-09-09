@@ -12,8 +12,12 @@ import java.io.PrintWriter;
 
 public class UserServlet extends HttpServlet {
 
+    private  UserRepository userRepository;
+
+    public void init() {
+        userRepository = new HibernateUserRepositoryImpl();
+    }
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        UserRepository userRepository = new HibernateUserRepositoryImpl();
 
         PrintWriter writer = response.getWriter();
         StringBuilder stringBuilder = new StringBuilder();
@@ -50,6 +54,44 @@ public class UserServlet extends HttpServlet {
             stringBuilder.append("</body>");
             stringBuilder.append("</html>");
         }
+
+        writer.println(stringBuilder);
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        PrintWriter writer = response.getWriter();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String usernameFromRequest = request.getHeader("username");
+
+        if (usernameFromRequest == null) {
+            stringBuilder.append("Empty username");
+            writer.println(stringBuilder);
+            return;
+        }
+
+        User user = new User();
+        user.setName(usernameFromRequest);
+
+        user = userRepository.create(user);
+
+        stringBuilder.append("<!DOCTYPE = html>");
+        stringBuilder.append("<html>");
+        stringBuilder.append("<head><title>");
+        stringBuilder.append("<h1>User details</h1>");
+        stringBuilder.append("</title></head>");
+
+        stringBuilder.append("<body>");
+        stringBuilder.append("<h1>User was created successfully</h1>");
+
+        stringBuilder.append("User ID: " + user.getId());
+        stringBuilder.append("<br/>");
+        stringBuilder.append("User name: " + user.getName());
+        stringBuilder.append("<br/>");
+        stringBuilder.append("<br/>");
+
+        stringBuilder.append("</body>");
+        stringBuilder.append("</html>");
 
         writer.println(stringBuilder);
     }
