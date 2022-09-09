@@ -78,7 +78,7 @@ public class FileServlet extends HttpServlet {
 
 
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         try (PrintWriter writer = response.getWriter()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -135,7 +135,9 @@ public class FileServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            response.reset();
+            response.setStatus(400);
+            response.getWriter().println("Can't save file on hard drive.");
         }
     }
 }
