@@ -64,7 +64,8 @@ public class UserServlet extends HttpServlet {
 
         String usernameFromRequest = request.getHeader("username");
 
-        if (usernameFromRequest == null) {
+        if (usernameFromRequest.isBlank()) {
+            response.setStatus(400);
             stringBuilder.append("Empty username");
             writer.println(stringBuilder);
             return;
@@ -95,4 +96,6 @@ public class UserServlet extends HttpServlet {
 
         writer.println(stringBuilder);
     }
+
+
 }
