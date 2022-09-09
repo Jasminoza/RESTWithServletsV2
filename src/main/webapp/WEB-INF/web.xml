@@ -29,6 +29,11 @@
     <servlet-name>Files</servlet-name>
     <servlet-class>org.yolkin.servlet.FilesServlet</servlet-class>
   </servlet>
+
+  <servlet>
+    <servlet-name>File</servlet-name>
+    <servlet-class>org.yolkin.servlet.FileServlet</servlet-class>
+  </servlet>
 <!--  ========================================================================================================  -->
   
   <servlet-mapping>
@@ -54,6 +59,11 @@
   <servlet-mapping>
     <servlet-name>Files</servlet-name>
     <url-pattern>/files</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>File</servlet-name>
+    <url-pattern>/file</url-pattern>
   </servlet-mapping>
 
 </web-app>
