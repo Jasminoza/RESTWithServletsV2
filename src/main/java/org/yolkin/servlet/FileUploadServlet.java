@@ -15,10 +15,13 @@ import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileUploadServlet extends HttpServlet {
     private final FileRepository fileRepository;
@@ -36,7 +39,8 @@ public class FileUploadServlet extends HttpServlet {
     private String filePath = "src/main/resources/uploads/";
     private java.io.File realFile;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         try (PrintWriter writer = response.getWriter()) {
             response.setContentType("text/html");
 
@@ -79,11 +83,13 @@ public class FileUploadServlet extends HttpServlet {
                     fileAtDB.setDateOfUploading(new Date());
                     fileAtDB = fileRepository.create(fileAtDB);
 
-//                    Long userId = Long.parseLong(request.getHeader("user_id"));
-//
+
+
+//                    Long userId = Long.parseLong(request.("user id"));
+
 //                    Event event = new Event();
-//                    event.setFile(fileAtDB);
-//                    event.setUsers(userRepository.getById(userId));
+//                    event.setFileId(fileAtDB.getId());
+//                    event.setUserId(userId);
 //
 //                    eventRepository.create(event);
 
@@ -104,7 +110,7 @@ public class FileUploadServlet extends HttpServlet {
         }
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         doGet(request, response);
     }
 

@@ -3,13 +3,10 @@ package org.yolkin;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.flywaydb.core.Flyway;
-import org.yolkin.model.User;
-import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
 
 public class Main {
     public static void main(String[] args) {
         migrateFlyway();
-
 
     }
 

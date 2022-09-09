@@ -8,6 +8,9 @@
         <h1>File Upload</h1>
         <h3>Please, select file to upload (max size is 100 kb)</h3> <br/>
             <form action="FileUploadServlet" method="post" enctype="multipart/form-data">
+                <label> User id:
+                    <input type="text" name="user id" />
+                </label><br/>
                 <input type="file" name="file" size="100"/><br/>
                 <input type="submit" value="Upload File"/>
             </form> <br/>
