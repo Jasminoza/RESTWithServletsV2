@@ -76,8 +76,6 @@ public class FileServlet extends HttpServlet {
         }
     }
 
-
-
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         try (PrintWriter writer = response.getWriter()) {
@@ -138,6 +136,54 @@ public class FileServlet extends HttpServlet {
             response.reset();
             response.setStatus(400);
             response.getWriter().println("Can't save file on hard drive.");
+        }
+    }
+
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try (PrintWriter writer = response.getWriter()) {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            Long idFromRequest;
+
+            try {
+                idFromRequest = Long.valueOf(request.getHeader("file_id"));
+            } catch (Exception e) {
+                response.setStatus(400);
+                stringBuilder.append("Incorrect file id.");
+                writer.println(stringBuilder);
+                return;
+            }
+
+            File file = fileRepository.getById(idFromRequest);
+
+            if (file == null) {
+                response.setStatus(400);
+                stringBuilder.append("File not found.");
+                writer.println(stringBuilder);
+                return;
+            }
+
+            stringBuilder.append("<!DOCTYPE = html>");
+            stringBuilder.append("<html>");
+            stringBuilder.append("<head><title>");
+            stringBuilder.append("<h1>File details</h1>");
+            stringBuilder.append("</title></head>");
+
+            java.io.File fileToDeletion = new java.io.File(PATH_FOR_UPLOADING + file.getName());
+            fileToDeletion.delete();
+
+            fileRepository.delete(idFromRequest);
+
+            stringBuilder.append("<body>");
+            stringBuilder.append("<h1>File " + file.getName() + " was removed successfully</h1>");
+            stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
+            stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
+            stringBuilder.append("<br/>");
+
+            stringBuilder.append("</body>");
+            stringBuilder.append("</html>");
+
+            writer.println(stringBuilder);
         }
     }
 }
