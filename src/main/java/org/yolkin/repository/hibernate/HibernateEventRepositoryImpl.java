@@ -6,6 +6,7 @@ import org.yolkin.model.Event;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.util.HibernateSessionFactoryUtil;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class HibernateEventRepositoryImpl implements EventRepository {
@@ -17,6 +18,7 @@ public class HibernateEventRepositoryImpl implements EventRepository {
 
     @Override
     public Event create(Event event) {
+        event.setEventId(generateEventId());
         return saveEventToDB(event);
     }
 
@@ -62,6 +64,17 @@ public class HibernateEventRepositoryImpl implements EventRepository {
         return ((event.getId() != null) ? event : null);
     }
 
+    private Long generateEventId() {
+        Long currentEventId;
+        List<Event> events = getAll();
+
+        if (events.size() == 0) {
+            currentEventId = 1L;
+        } else {
+            currentEventId = events.stream().max(Comparator.comparingLong(Event::getId)).get().getId() + 1L;
+        }
+        return currentEventId;
+    }
     private Session getSession(){
         return HibernateSessionFactoryUtil.getSessionFactory().openSession();
     }

@@ -2,6 +2,7 @@ package org.yolkin.servlet;
 
 import org.yolkin.model.Event;
 import org.yolkin.model.File;
+import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.util.ServletHelper;
@@ -30,16 +31,18 @@ public class EventsServlet extends HttpServlet {
         helper.addH1ToResponseBody("EVENTS DATA");
 
         for (Event event : events) {
-            helper.addToResponseBody("Event ID: " + event.getId());
-            helper.addToResponseBody("User ID: " + event.getUser().getId());
-            helper.addToResponseBody("User name: " + event.getUser().getName());
-            helper.addToResponseBody("<br/>");
+            helper.addH2ToResponseBody("Event ID: " + event.getEventId());
 
-            for (File file : event.getFiles()) {
-                helper.addToResponseBody("File ID: " + file.getId());
-                helper.addToResponseBody("File name: " + file.getName());
-                helper.addToResponseBody("File date of uploading: " + file.getDateOfUploading());
-                helper.addToResponseBody("<br/>");
+            for (User user : event.getUsers()) {
+                helper.addH3ToResponseBody("User ID: " + user.getId());
+                helper.addH3ToResponseBody("User name: " + user.getName());
+
+                for (File file : event.getFiles()) {
+                    helper.addToResponseBody("File ID: " + file.getId());
+                    helper.addToResponseBody("File name: " + file.getName());
+                    helper.addToResponseBody("File date of uploading: " + file.getDateOfUploading());
+                    helper.addToResponseBody("<br/>");
+                }
             }
         }
 

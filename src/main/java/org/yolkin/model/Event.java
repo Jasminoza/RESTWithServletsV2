@@ -1,18 +1,35 @@
 package org.yolkin.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import java.util.List;
 
 @Entity
-@Embeddable
 @Table(name = "events")
 public class Event {
     @Id
     @GeneratedValue(generator = "increment")
     private Long id;
 
-    private User user;
+    @Column(name = "event_id")
+    private Long eventId;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "events",
+            joinColumns = {@JoinColumn(name = "event_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<User> users;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "events",
+            joinColumns = {@JoinColumn(name = "event_id")},
+            inverseJoinColumns = {@JoinColumn(name = "file_id")}
+    )
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<File> files;
 
     public Event() {
@@ -26,12 +43,20 @@ public class Event {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public List<File> getFiles() {

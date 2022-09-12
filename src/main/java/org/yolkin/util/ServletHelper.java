@@ -57,6 +57,14 @@ public class ServletHelper {
         stringBuilder.append("<h1> " + text + "</h1>");
     }
 
+    public void addH2ToResponseBody(String text) {
+        stringBuilder.append("<h2> " + text + "</h2>");
+    }
+
+    public void addH3ToResponseBody(String text) {
+        stringBuilder.append("<h3> " + text + "</h3>");
+    }
+
     public void addToResponseBody(String text) {
         stringBuilder.append(text);
         stringBuilder.append("<br/>");

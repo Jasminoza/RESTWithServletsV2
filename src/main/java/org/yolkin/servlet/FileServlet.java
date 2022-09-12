@@ -3,9 +3,15 @@ package org.yolkin.servlet;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.yolkin.model.Event;
 import org.yolkin.model.File;
+import org.yolkin.model.User;
+import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
+import org.yolkin.repository.UserRepository;
+import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateFileRepositoryImpl;
+import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
 import org.yolkin.util.ServletHelper;
 
 import javax.servlet.http.HttpServlet;
@@ -13,17 +19,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 public class FileServlet extends HttpServlet {
     private FileRepository fileRepository;
+    private EventRepository eventRepository;
+    private UserRepository userRepository;
     static final int MAX_FILE_SIZE = 100 * 1024;
     static final int MAX_MEMORY_SIZE = 100 * 1024;
     private final String PATH_FOR_UPLOADING = "src/main/webapp/uploads";
 
     public void init() {
         fileRepository = new HibernateFileRepositoryImpl();
+        eventRepository = new HibernateEventRepositoryImpl();
+        userRepository = new HibernateUserRepositoryImpl();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -67,6 +79,25 @@ public class FileServlet extends HttpServlet {
 
         ServletHelper helper = new ServletHelper(response);
 
+        Long userIdFromRequest;
+
+        try {
+            userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
+        } catch (Exception e) {
+            helper.sendBadRequestStatus("Incorrect user id.");
+            return;
+        }
+
+        User user = userRepository.getById(userIdFromRequest);
+        List<File> currentFiles = new ArrayList<>();
+
+        if (user == null || user.getId() == 0L) {
+            helper.sendBadRequestStatus("There is no user with such id.");
+            return;
+        }
+
+        List<User> currentUser = List.of(user);
+
         ServletFileUpload uploader = helper.setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 
         try {
@@ -81,21 +112,32 @@ public class FileServlet extends HttpServlet {
                     java.io.File realFile = helper.getFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
 
                     try {
-                        fileItem.write(realFile);
                         File fileAtDB = new File();
                         fileAtDB.setName(realFile.getName());
                         fileAtDB.setDateOfUploading(date);
                         fileAtDB = fileRepository.create(fileAtDB);
 
-                        helper.addH1ToResponseBody("File " + fileAtDB.getName() + " was saved successfully.");
+                        fileItem.write(realFile);
+
+                        currentFiles.add(fileAtDB);
 
                     } catch (Exception e) {
-                        realFile.delete();
                         helper.sendBadRequestStatus("Can't save file on hard drive.");
                         return;
                     }
                 }
             }
+
+            Event event = new Event();
+
+            event.setUsers(currentUser);
+            event.setFiles(currentFiles);
+            eventRepository.create(event);
+
+            for (File file : currentFiles) {
+                helper.addH1ToResponseBody("File " + file.getName() + " was saved successfully.");
+            }
+
             helper.sendResponse();
         } catch (FileUploadException e) {
             helper.sendBadRequestStatus("Wrong request.");
