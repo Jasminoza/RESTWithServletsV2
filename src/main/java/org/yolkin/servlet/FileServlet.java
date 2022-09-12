@@ -31,7 +31,7 @@ public class FileServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        ServletHelper helper = new ServletHelper(request, response);
+        ServletHelper helper = new ServletHelper(response);
 
         Long idFromRequest;
 
@@ -68,7 +68,7 @@ public class FileServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        ServletHelper helper = new ServletHelper(request, response);
+        ServletHelper helper = new ServletHelper(response);
 
         ServletFileUpload uploader = helper.setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 
@@ -105,51 +105,35 @@ public class FileServlet extends HttpServlet {
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try (PrintWriter writer = response.getWriter()) {
-            StringBuilder stringBuilder = new StringBuilder();
+        ServletHelper helper = new ServletHelper(response);
 
-            Long idFromRequest;
+        Long idFromRequest;
 
-            try {
-                idFromRequest = Long.valueOf(request.getHeader("file_id"));
-            } catch (Exception e) {
-                response.setStatus(400);
-                stringBuilder.append("Incorrect file id.");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            File file = fileRepository.getById(idFromRequest);
-
-            if (file == null) {
-                response.setStatus(400);
-                stringBuilder.append("File not found.");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            stringBuilder.append("<!DOCTYPE = html>");
-            stringBuilder.append("<html>");
-            stringBuilder.append("<head><title>");
-            stringBuilder.append("<h1>File details</h1>");
-            stringBuilder.append("</title></head>");
-
-            java.io.File fileToDeletion = new java.io.File(PATH_FOR_UPLOADING + java.io.File.separator + file.getName());
-            fileToDeletion.delete();
-
-            fileRepository.delete(idFromRequest);
-
-            stringBuilder.append("<body>");
-            stringBuilder.append("<h1>File " + file.getName() + " was removed successfully</h1>");
-            stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
-            stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
-            stringBuilder.append("<br/>");
-
-            stringBuilder.append("</body>");
-            stringBuilder.append("</html>");
-
-            writer.println(stringBuilder);
+        try {
+            idFromRequest = Long.valueOf(request.getHeader("file_id"));
+        } catch (Exception e) {
+            helper.sendBadRequestStatus("Incorrect file id.");
+            return;
         }
+
+        File file = fileRepository.getById(idFromRequest);
+
+        if (file == null) {
+           helper.sendBadRequestStatus("File not found.");
+            return;
+        }
+
+        helper.setResponseHead("File details");
+
+        java.io.File fileToDeletion = new java.io.File(PATH_FOR_UPLOADING + java.io.File.separator + file.getName());
+        fileToDeletion.delete();
+
+        fileRepository.delete(idFromRequest);
+
+        helper.setResponseBody("File " + file.getName() + " was removed successfully.");
+        helper.closeResponseBodyTag();
+        helper.closeResponseTag();
+        helper.sendResponse();
     }
 
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -15,11 +15,9 @@ public class ServletHelper {
 
     private StringBuilder stringBuilder = new StringBuilder();
     private HttpServletResponse response;
-    private HttpServletRequest request;
 
-    public ServletHelper(HttpServletRequest request, HttpServletResponse response) {
+    public ServletHelper(HttpServletResponse response) {
         this.response = response;
-        this.request = request;
     }
 
     public void sendBadRequestStatus(String cause) throws IOException {
