@@ -17,10 +17,16 @@ public class UsersServlet extends HttpServlet {
         UserRepository userRepository = new HibernateUserRepositoryImpl();
 
         ServletHelper helper = new ServletHelper(response);
+        helper.setResponseHead("Users list");
 
         List<User> users = userRepository.getAll();
 
-        helper.setResponseHead("Users list");
+        if (users.size() == 0) {
+            helper.addToResponseBody("There is no users in database.");
+            helper.sendResponse();
+            return;
+        }
+
         helper.addH1ToResponseBody("USERS DATA");
 
         for (User user : users) {
