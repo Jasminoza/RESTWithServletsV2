@@ -24,6 +24,11 @@
     <servlet-name>File</servlet-name>
     <servlet-class>org.yolkin.servlet.FileServlet</servlet-class>
   </servlet>
+
+  <servlet>
+    <servlet-name>Events</servlet-name>
+    <servlet-class>org.yolkin.servlet.EventsServlet</servlet-class>
+  </servlet>
 <!--  ========================================================================================================  -->
 
   <servlet-mapping>
@@ -44,6 +49,11 @@
   <servlet-mapping>
     <servlet-name>File</servlet-name>
     <url-pattern>/file</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>Events</servlet-name>
+    <url-pattern>/events</url-pattern>
   </servlet-mapping>
 
 </web-app>
