@@ -2,8 +2,6 @@ package org.yolkin.model;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "users")
 public class User {
@@ -13,15 +11,6 @@ public class User {
 
     @Column(name = "name", nullable = false)
     private String name;
-
-//    @OneToMany(
-//            mappedBy = "users",
-//            targetEntity = Event.class,
-//            fetch = FetchType.LAZY,
-//            cascade = CascadeType.ALL
-//    )
-//    @JoinColumn(name = "event_id", nullable = false)
-//    private List<Event> events;
 
     public User() {
     }
@@ -41,12 +30,4 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
-//    public List<Event> getEvents() {
-//        return events;
-//    }
-//
-//    public void setEvents(List<Event> events) {
-//        this.events = events;
-//    }
 }

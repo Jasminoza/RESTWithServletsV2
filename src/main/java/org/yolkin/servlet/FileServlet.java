@@ -90,7 +90,9 @@ public class FileServlet extends HttpServlet {
                         helper.setResponseBody("File " + fileAtDB.getName() + " was saved successfully.");
 
                     } catch (Exception e) {
+                        realFile.delete();
                         helper.sendBadRequestStatus("Can't save file on hard drive.");
+                        return;
                     }
                 }
             }

@@ -59,7 +59,7 @@ public class HibernateEventRepositoryImpl implements EventRepository {
             }
         }
 
-        return ((event.getEventId() != null) ? event : null);
+        return ((event.getId() != null) ? event : null);
     }
 
     private Session getSession(){
