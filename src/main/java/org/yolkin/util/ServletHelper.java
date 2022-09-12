@@ -53,18 +53,23 @@ public class ServletHelper {
         stringBuilder.append("<body>");
     }
 
-    public void setResponseBody(String body) {
-        stringBuilder.append("<h1> " + body + "</h1>");
+    public void addH1ToResponseBody(String text) {
+        stringBuilder.append("<h1> " + text + "</h1>");
     }
 
-    public void closeResponseBodyTag() {
+    public void addToResponseBody(String text) {
+        stringBuilder.append(text);
+        stringBuilder.append("<br/>");
+    }
+
+    private void closeResponseBodyTag() {
         stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
         stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
         stringBuilder.append("<br/>");
         stringBuilder.append("</body>");
     }
 
-    public void closeResponseTag() {
+    private void closeResponseTag() {
         stringBuilder.append("</html>");
     }
 
@@ -84,6 +89,9 @@ public class ServletHelper {
     }
 
     public void sendResponse() throws IOException {
+        stringBuilder.append("<br/>");
+        closeResponseBodyTag();
+        closeResponseTag();
         response.getWriter().println(stringBuilder);
     }
 }

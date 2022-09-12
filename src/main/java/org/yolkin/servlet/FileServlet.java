@@ -87,7 +87,7 @@ public class FileServlet extends HttpServlet {
                         fileAtDB.setDateOfUploading(date);
                         fileAtDB = fileRepository.create(fileAtDB);
 
-                        helper.setResponseBody("File " + fileAtDB.getName() + " was saved successfully.");
+                        helper.addH1ToResponseBody("File " + fileAtDB.getName() + " was saved successfully.");
 
                     } catch (Exception e) {
                         realFile.delete();
@@ -96,8 +96,6 @@ public class FileServlet extends HttpServlet {
                     }
                 }
             }
-            helper.closeResponseBodyTag();
-            helper.closeResponseTag();
             helper.sendResponse();
         } catch (FileUploadException e) {
             helper.sendBadRequestStatus("Wrong request.");
@@ -130,9 +128,7 @@ public class FileServlet extends HttpServlet {
 
         fileRepository.delete(idFromRequest);
 
-        helper.setResponseBody("File " + file.getName() + " was removed successfully.");
-        helper.closeResponseBodyTag();
-        helper.closeResponseTag();
+        helper.addH1ToResponseBody("File " + file.getName() + " was removed successfully.");
         helper.sendResponse();
     }
 
@@ -180,9 +176,7 @@ public class FileServlet extends HttpServlet {
                             file.setDateOfUploading(date);
                             file = fileRepository.update(file);
 
-                            helper.setResponseBody("File " + file.getName() + " was updated successfully.");
-                            helper.closeResponseBodyTag();
-                            helper.closeResponseTag();
+                            helper.addH1ToResponseBody("File " + file.getName() + " was updated successfully.");
                             helper.sendResponse();
                         }
                     } catch (Exception e) {
