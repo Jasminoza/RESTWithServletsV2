@@ -50,17 +50,17 @@ public class ServletHelper {
         stringBuilder.append("<head><title>");
         stringBuilder.append("<h1>" + title + "</h1>");
         stringBuilder.append("</title></head>");
+        stringBuilder.append("<body>");
     }
 
     public void setResponseBody(String body) {
-        stringBuilder.append("<body>");
         stringBuilder.append("<h1> " + body + "</h1>");
-        stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
-        stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
-        stringBuilder.append("<br/>");
     }
 
     public void closeResponseBodyTag() {
+        stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
+        stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
+        stringBuilder.append("<br/>");
         stringBuilder.append("</body>");
     }
 

@@ -88,14 +88,15 @@ public class FileServlet extends HttpServlet {
                         fileAtDB = fileRepository.create(fileAtDB);
 
                         helper.setResponseBody("File " + fileAtDB.getName() + " was saved successfully.");
-                        helper.closeResponseBodyTag();
-                        helper.closeResponseTag();
-                        helper.sendResponse();
+
                     } catch (Exception e) {
                         helper.sendBadRequestStatus("Can't save file on hard drive.");
                     }
                 }
             }
+            helper.closeResponseBodyTag();
+            helper.closeResponseTag();
+            helper.sendResponse();
         } catch (FileUploadException e) {
             helper.sendBadRequestStatus("Wrong request.");
         }
