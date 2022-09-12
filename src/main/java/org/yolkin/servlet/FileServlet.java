@@ -31,7 +31,7 @@ public class FileServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        ServletHelper helper = new ServletHelper(response, request);
+        ServletHelper helper = new ServletHelper(request, response);
 
         Long idFromRequest;
 
@@ -68,64 +68,39 @@ public class FileServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        try (PrintWriter writer = response.getWriter()) {
-            StringBuilder stringBuilder = new StringBuilder();
+        ServletHelper helper = new ServletHelper(request, response);
 
-            DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-            diskFileItemFactory.setRepository(new java.io.File(PATH_FOR_UPLOADING));
-            diskFileItemFactory.setSizeThreshold(MAX_MEMORY_SIZE);
+        ServletFileUpload uploader = helper.setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 
-            ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
-            upload.setSizeMax(MAX_FILE_SIZE);
-
-            List<FileItem> fileItems = upload.parseRequest(request);
-
-            Iterator<FileItem> iterator = fileItems.iterator();
-
-            stringBuilder.append("<!DOCTYPE = html>");
-            stringBuilder.append("<html>");
-            stringBuilder.append("<head><title>");
-            stringBuilder.append("<h1>File details</h1>");
-            stringBuilder.append("</title></head>");
+        try {
+            Iterator<FileItem> iterator = uploader.parseRequest(request).iterator();
+            helper.setResponseHead("File details");
 
             while (iterator.hasNext()) {
                 FileItem fileItem = iterator.next();
                 Date date = new Date();
                 if (!fileItem.isFormField()) {
 
-                    java.io.File realFile;
+                    java.io.File realFile = helper.getFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
 
-                    String fileName = fileItem.getName();
-                    if (fileName.lastIndexOf("\\") >= 0) {
-                        realFile = new java.io.File(PATH_FOR_UPLOADING + date + " " +
-                                fileName.substring(fileName.lastIndexOf("\\")));
-                    } else {
-                        realFile = new java.io.File(PATH_FOR_UPLOADING + date + " " +
-                                fileName.substring(fileName.lastIndexOf("\\") + 1));
+                    try {
+                        fileItem.write(realFile);
+                        File fileAtDB = new File();
+                        fileAtDB.setName(realFile.getName());
+                        fileAtDB.setDateOfUploading(date);
+                        fileAtDB = fileRepository.create(fileAtDB);
+
+                        helper.setResponseBody("File " + fileAtDB.getName() + " was saved successfully.");
+                        helper.closeResponseBodyTag();
+                        helper.closeResponseTag();
+                        helper.sendResponse();
+                    } catch (Exception e) {
+                        helper.sendBadRequestStatus("Can't save file on hard drive.");
                     }
-                    fileItem.write(realFile);
-
-                    File fileAtDB = new File();
-                    fileAtDB.setName(date + " " + fileName);
-                    fileAtDB.setDateOfUploading(date);
-                    fileAtDB = fileRepository.create(fileAtDB);
-
-                    stringBuilder.append("<body>");
-                    stringBuilder.append("<h1>File " + fileAtDB.getName() + " was saved successfully</h1>");
-                    stringBuilder.append("<br/><li><a href=\"/index.jsp\">Go to main page</a></li>");
-                    stringBuilder.append("<br/><li><a href=\"/FileUpload.html\">Upload new file</a></li>");
-                    stringBuilder.append("<br/>");
-
-                    stringBuilder.append("</body>");
-                    stringBuilder.append("</html>");
-
-                    writer.println(stringBuilder);
                 }
             }
-        } catch (Exception e) {
-            response.reset();
-            response.setStatus(400);
-            response.getWriter().println("Can't save file on hard drive.");
+        } catch (FileUploadException e) {
+            helper.sendBadRequestStatus("Wrong request.");
         }
     }
 
@@ -159,7 +134,7 @@ public class FileServlet extends HttpServlet {
             stringBuilder.append("<h1>File details</h1>");
             stringBuilder.append("</title></head>");
 
-            java.io.File fileToDeletion = new java.io.File(PATH_FOR_UPLOADING + file.getName());
+            java.io.File fileToDeletion = new java.io.File(PATH_FOR_UPLOADING + java.io.File.separator + file.getName());
             fileToDeletion.delete();
 
             fileRepository.delete(idFromRequest);
