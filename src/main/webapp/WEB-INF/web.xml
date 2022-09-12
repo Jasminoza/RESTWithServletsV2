@@ -4,12 +4,6 @@
 
 <web-app>
   <display-name>RestWithServlets</display-name>
-  
-  <servlet>
-    <servlet-name>DatabaseDemo</servlet-name>
-    <servlet-class>org.yolkin.servlet.DatabaseDemo</servlet-class>
-  </servlet>
-
 
   <servlet>
     <servlet-name>Users</servlet-name>
@@ -31,11 +25,6 @@
     <servlet-class>org.yolkin.servlet.FileServlet</servlet-class>
   </servlet>
 <!--  ========================================================================================================  -->
-  
-  <servlet-mapping>
-    <servlet-name>DatabaseDemo</servlet-name>
-    <url-pattern>/DatabaseDemo</url-pattern>
-  </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>Users</servlet-name>
