@@ -100,6 +100,26 @@ public class UserRestControllerV1 extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String url = req.getRequestURL().toString();
+        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 
+        if (id.isBlank()) {
+            resp.sendError(400, "User id can't be null");
+        } else {
+            try {
+                Long idFromRequest = Long.valueOf(id);
+
+                User user = userService.getById(idFromRequest);
+
+                if (user != null) {
+                    userService.delete(idFromRequest);
+                    resp.setStatus(200);
+                } else {
+                    resp.sendError(404, "There is no user with such id");
+                }
+            } catch (NumberFormatException e) {
+                resp.sendError(400, "Incorrect user id");
+            }
+        }
     }
 }
