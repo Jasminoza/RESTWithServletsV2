@@ -1,6 +1,8 @@
 package org.yolkin.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class Event {
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "file_id")
     )
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<File> files;
 
     public Event() {

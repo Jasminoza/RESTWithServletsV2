@@ -29,6 +29,11 @@
     <servlet-name>Events</servlet-name>
     <servlet-class>org.yolkin.servlet.EventsServlet</servlet-class>
   </servlet>
+
+  <servlet>
+    <servlet-name>Event</servlet-name>
+    <servlet-class>org.yolkin.servlet.EventServlet</servlet-class>
+  </servlet>
 <!--  ========================================================================================================  -->
 
   <servlet-mapping>
@@ -54,6 +59,11 @@
   <servlet-mapping>
     <servlet-name>Events</servlet-name>
     <url-pattern>/events</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>Event</servlet-name>
+    <url-pattern>/event</url-pattern>
   </servlet-mapping>
 
 </web-app>
