@@ -1,41 +1,49 @@
 package org.yolkin.rest;
 
-import com.google.gson.Gson;
 import org.yolkin.model.File;
-import org.yolkin.repository.FileRepository;
-import org.yolkin.repository.hibernate.HibernateFileRepositoryImpl;
+import org.yolkin.service.FileService;
+import org.yolkin.util.GsonHelper;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 public class FileRestControllerV1 extends HttpServlet {
 
-    private final FileRepository fileRepository;
-    private final Gson GSON = new Gson();
+    private final FileService fileService;
 
     public FileRestControllerV1() {
-        fileRepository = new HibernateFileRepositoryImpl();
+        fileService = new FileService();
     }
 
-    public FileRestControllerV1(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
+    public FileRestControllerV1(FileService fileService) {
+        this.fileService = fileService;
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        GsonHelper helper = new GsonHelper(resp, req);
 
-        if (req.getRequestURL().toString().contains()) {
-            List<File> files = fileRepository.getAll();
-            resp.getWriter().write(GSON.toJson(files));
+        String url = req.getRequestURL().toString();
+        String id = url.substring(url.indexOf("/files") + 6);
+
+        if (id.isBlank()) {
+            helper.sendJsonFrom(fileService.getAll());
         } else {
-            File file = fileRepository.getById(1L);
-            resp.getWriter().write(GSON.toJson(file));
-        }
+            Long idFromRequest;
 
+            try {
+                idFromRequest = Long.valueOf(id);
+            } catch (Exception e) {
+                helper.sendBadRequestStatus("Incorrect file id.");
+                return;
+            }
+
+            File file = fileService.getById(idFromRequest);
+            helper.sendJsonFrom(file);
+        }
     }
 
     @Override

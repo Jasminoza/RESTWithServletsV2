@@ -14,8 +14,8 @@ public class User {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<Event> events;
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+//    private List<Event> events;
 
     public User() {
     }
@@ -36,11 +36,11 @@ public class User {
         this.name = name;
     }
 
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> files) {
-        this.events = files;
-    }
+//    public List<Event> getEvents() {
+//        return events;
+//    }
+//
+//    public void setEvents(List<Event> events) {
+//        this.events = events;
+//    }
 }

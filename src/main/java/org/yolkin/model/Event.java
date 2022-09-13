@@ -13,7 +13,7 @@ public class Event {
     @GeneratedValue(generator = "increment")
     private Long id;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "events_files",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -22,6 +22,7 @@ public class Event {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<File> files;
 
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -44,11 +45,11 @@ public class Event {
         this.files = files;
     }
 
-    @Override
-    public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", files=" + files +
-                '}';
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
