@@ -13,78 +13,64 @@ import java.io.PrintWriter;
 
 public class UserServlet extends HttpServlet {
 
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
 
     public void init() {
         userRepository = new HibernateUserRepositoryImpl();
     }
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ServletHelper helper = new ServletHelper(response);
 
         Long userId;
 
-            try {
-                userId = Long.valueOf(request.getHeader("user_id"));
-            } catch (Exception e) {
-                helper.sendBadRequestStatus("Incorrect user id.");
-                return;
-            }
+        try {
+            userId = Long.valueOf(request.getHeader("user_id"));
+        } catch (Exception e) {
+            helper.sendBadRequestStatus("Incorrect user id.");
+            return;
+        }
 
-            User user = userRepository.getById(userId);
+        User user = userRepository.getById(userId);
 
-            helper.setResponseHead("User details");
+        helper.setResponseHead("User details");
 
-            if (user == null) {
-                helper.sendBadRequestStatus("User not found");
-                return;
-            } else {
-                helper.addH1ToResponseBody("User details");
-                helper.addToResponseBody("User ID: " + user.getId());
-                helper.addToResponseBody("User name: " + user.getName());
-                helper.addToResponseBody("<br/>");
-            }
+        if (user == null) {
+            helper.sendBadRequestStatus("User not found");
+            return;
+        } else {
+            helper.addH1ToResponseBody("User details");
+            helper.addToResponseBody("User ID: " + user.getId());
+            helper.addToResponseBody("User name: " + user.getName());
+            helper.addToResponseBody("<br/>");
+        }
 
-            helper.sendResponse();
+        helper.sendResponse();
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try (PrintWriter writer = response.getWriter()) {
-            StringBuilder stringBuilder = new StringBuilder();
+        ServletHelper helper = new ServletHelper(response);
 
-            String usernameFromRequest = request.getHeader("username");
+        String usernameFromRequest = request.getHeader("username");
 
-            if (usernameFromRequest.isBlank()) {
-                response.setStatus(400);
-                stringBuilder.append("Empty username.");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            User user = new User();
-            user.setName(usernameFromRequest);
-
-            user = userRepository.create(user);
-
-            stringBuilder.append("<!DOCTYPE = html>");
-            stringBuilder.append("<html>");
-            stringBuilder.append("<head><title>");
-            stringBuilder.append("<h1>User details</h1>");
-            stringBuilder.append("</title></head>");
-
-            stringBuilder.append("<body>");
-            stringBuilder.append("<h1>User was created successfully</h1>");
-
-            stringBuilder.append("User ID: " + user.getId());
-            stringBuilder.append("<br/>");
-            stringBuilder.append("User name: " + user.getName());
-            stringBuilder.append("<br/>");
-            stringBuilder.append("<br/>");
-
-            stringBuilder.append("</body>");
-            stringBuilder.append("</html>");
-
-            writer.println(stringBuilder);
+        if (usernameFromRequest.isBlank()) {
+            helper.sendBadRequestStatus("Empty username.");
+            return;
         }
+
+        User user = new User();
+        user.setName(usernameFromRequest);
+
+        user = userRepository.create(user);
+
+        helper.setResponseHead("User details");
+        helper.addH1ToResponseBody("User was created successfully");
+
+        helper.addToResponseBody("User ID: " + user.getId());
+        helper.addToResponseBody("User name: " + user.getName());
+        helper.addToResponseBody("<br/>");
+
+        helper.sendResponse();
     }
 
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
