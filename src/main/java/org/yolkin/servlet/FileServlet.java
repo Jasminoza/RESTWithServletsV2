@@ -96,8 +96,6 @@ public class FileServlet extends HttpServlet {
             return;
         }
 
-        List<User> currentUser = List.of(user);
-
         ServletFileUpload uploader = helper.setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 
         try {
@@ -115,6 +113,7 @@ public class FileServlet extends HttpServlet {
                         File fileAtDB = new File();
                         fileAtDB.setName(realFile.getName());
                         fileAtDB.setDateOfUploading(date);
+                        fileAtDB.setUser(user);
                         fileAtDB = fileRepository.create(fileAtDB);
 
                         fileItem.write(realFile);
@@ -128,11 +127,16 @@ public class FileServlet extends HttpServlet {
                 }
             }
 
-            Event event = new Event();
+            try {
+                Event event = new Event();
+                event.setFiles(currentFiles);
+                eventRepository.create(event);
 
-            event.setUsers(currentUser);
-            event.setFiles(currentFiles);
-            eventRepository.create(event);
+            } catch (Exception e) {
+                    for (File file : currentFiles) {
+                        fileRepository.delete(file.getId());
+                    }
+            }
 
             for (File file : currentFiles) {
                 helper.addH1ToResponseBody("File " + file.getName() + " was saved successfully.");

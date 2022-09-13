@@ -2,6 +2,8 @@ package org.yolkin.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -11,6 +13,9 @@ public class User {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<File> files;
 
     public User() {
     }
@@ -29,5 +34,13 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<File> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<File> files) {
+        this.files = files;
     }
 }

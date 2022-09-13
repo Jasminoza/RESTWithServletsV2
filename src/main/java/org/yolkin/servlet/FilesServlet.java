@@ -31,6 +31,7 @@ public class FilesServlet extends HttpServlet {
             helper.addToResponseBody("File ID: " + file.getId());
             helper.addToResponseBody("File name: " + file.getName());
             helper.addToResponseBody("File date of uploading: " + file.getDateOfUploading());
+            helper.addToResponseBody("Uploaded user: " + file.getUser().getName());
             helper.addToResponseBody("<br/>");
         }
 
