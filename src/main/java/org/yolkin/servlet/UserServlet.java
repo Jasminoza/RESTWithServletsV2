@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class UserServlet extends HttpServlet {
 
@@ -113,43 +112,28 @@ public class UserServlet extends HttpServlet {
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try (PrintWriter writer = response.getWriter()) {
-            StringBuilder stringBuilder = new StringBuilder();
+        ServletHelper helper = new ServletHelper(response);
 
-            Long userIdFromRequest;
-            try {
-                userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
-            } catch (Exception e) {
-                response.setStatus(400);
-                stringBuilder.append("Incorrect user id.");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            User user = userRepository.getById(userIdFromRequest);
-
-            if (user == null) {
-                response.setStatus(400);
-                stringBuilder.append("User not found.");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            userRepository.delete(userIdFromRequest);
-
-            stringBuilder.append("<!DOCTYPE = html>");
-            stringBuilder.append("<html>");
-            stringBuilder.append("<head><title>");
-            stringBuilder.append("<h1>User details</h1>");
-            stringBuilder.append("</title></head>");
-
-            stringBuilder.append("<body>");
-            stringBuilder.append("<h1>User was deleted successfully</h1>");
-
-            stringBuilder.append("</body>");
-            stringBuilder.append("</html>");
-
-            writer.println(stringBuilder);
+        Long userIdFromRequest;
+        try {
+            userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
+        } catch (Exception e) {
+            helper.sendBadRequestStatus("Incorrect user id.");
+            return;
         }
+
+        User user = userRepository.getById(userIdFromRequest);
+
+        if (user == null) {
+            helper.sendBadRequestStatus("User not found.");
+            return;
+        }
+
+        userRepository.delete(userIdFromRequest);
+
+        helper.setResponseHead("User details");
+        helper.addH1ToResponseBody("User was deleted successfully");
+
+        helper.sendResponse();
     }
 }
