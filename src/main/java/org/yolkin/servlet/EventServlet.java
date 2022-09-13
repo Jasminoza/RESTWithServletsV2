@@ -43,4 +43,30 @@ public class EventServlet extends HttpServlet {
 
         helper.sendResponse();
     }
+
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ServletHelper helper = new ServletHelper(response);
+
+        Long idFromRequest;
+
+        try {
+            idFromRequest = Long.valueOf(request.getHeader("event_id"));
+        } catch (Exception e) {
+            helper.sendBadRequestStatus("Incorrect event id.");
+            return;
+        }
+
+        Event event = eventRepository.getById(idFromRequest);
+
+        if (event == null) {
+            helper.sendBadRequestStatus("There is no event with such id.");
+            return;
+        }
+
+        eventRepository.delete(idFromRequest);
+
+        helper.setResponseHead("Event details");
+        helper.addH1ToResponseBody("Event with id " + event.getId() + " was deleted successfully.");
+        helper.sendResponse();
+    }
 }
