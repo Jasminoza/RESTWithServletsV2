@@ -1,5 +1,6 @@
 package org.yolkin.rest;
 
+import org.yolkin.model.User;
 import org.yolkin.service.UserService;
 import org.yolkin.util.GsonHelper;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 
 public class UserRestControllerV1 extends HttpServlet {
     private final UserService userService;
+    private final String mappingUrl = "/users/";
 
     public UserRestControllerV1() {
         userService = new UserService();
@@ -21,18 +23,26 @@ public class UserRestControllerV1 extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        GsonHelper helper = new GsonHelper(resp, req);
+        GsonHelper helper = new GsonHelper(resp);
 
-        String id = req.getHeader("user_id");
+        String url = req.getRequestURL().toString();
+        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 
-        if (id == null) {
+        if (id.isBlank()) {
             helper.sendJsonFrom(userService.getAll());
         } else {
+            Long idFromRequest;
+
             try {
-                Long idFromRequest = Long.valueOf(id);
-                helper.sendJsonFrom(userService.getById(idFromRequest));
+                idFromRequest = Long.valueOf(id);
+                User user = userService.getById(idFromRequest);
+                if (user != null) {
+                    helper.sendJsonFrom(user);
+                } else {
+                    resp.sendError(404, "There is no user with such id.");
+                }
             } catch (Exception e) {
-                helper.sendBadRequestStatus("Incorrect user id.");
+                resp.sendError(400, "Incorrect user id.");
             }
         }
     }

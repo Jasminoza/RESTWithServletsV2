@@ -24,7 +24,7 @@ public class FileRestControllerV1 extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        GsonHelper helper = new GsonHelper(resp, req);
+        GsonHelper helper = new GsonHelper(resp);
 
         String url = req.getRequestURL().toString();
         String id = url.substring(url.indexOf("/files") + 6);
@@ -37,7 +37,7 @@ public class FileRestControllerV1 extends HttpServlet {
             try {
                 idFromRequest = Long.valueOf(id);
             } catch (Exception e) {
-                helper.sendBadRequestStatus("Incorrect file id.");
+                resp.sendError(400, "Incorrect file id.");
                 return;
             }
 
