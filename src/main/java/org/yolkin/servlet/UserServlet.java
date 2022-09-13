@@ -74,60 +74,42 @@ public class UserServlet extends HttpServlet {
     }
 
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try (PrintWriter writer = response.getWriter()) {
-            StringBuilder stringBuilder = new StringBuilder();
+        ServletHelper helper = new ServletHelper(response);
 
-            String usernameFromRequest = request.getHeader("username");
-            Long userIdFromRequest;
-            try {
-                userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
-            } catch (Exception e) {
-                response.setStatus(400);
-                stringBuilder.append("Incorrect user id.");
-                writer.println(stringBuilder);
-                return;
-            }
+        String usernameFromRequest = request.getHeader("username");
 
-            if (usernameFromRequest.isBlank()) {
-                response.setStatus(400);
-                stringBuilder.append("Empty username");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            if (userRepository.getById(userIdFromRequest) == null) {
-                response.setStatus(400);
-                stringBuilder.append("User not found.");
-                writer.println(stringBuilder);
-                return;
-            }
-
-            User user = new User();
-            user.setId(userIdFromRequest);
-            user.setName(usernameFromRequest);
-
-            user = userRepository.update(user);
-
-            stringBuilder.append("<!DOCTYPE = html>");
-            stringBuilder.append("<html>");
-            stringBuilder.append("<head><title>");
-            stringBuilder.append("<h1>User details</h1>");
-            stringBuilder.append("</title></head>");
-
-            stringBuilder.append("<body>");
-            stringBuilder.append("<h1>User was updated successfully</h1>");
-
-            stringBuilder.append("User ID: " + user.getId());
-            stringBuilder.append("<br/>");
-            stringBuilder.append("User name: " + user.getName());
-            stringBuilder.append("<br/>");
-            stringBuilder.append("<br/>");
-
-            stringBuilder.append("</body>");
-            stringBuilder.append("</html>");
-
-            writer.println(stringBuilder);
+        Long userIdFromRequest;
+        try {
+            userIdFromRequest = Long.valueOf(request.getHeader("user_id"));
+        } catch (Exception e) {
+            helper.sendBadRequestStatus("Incorrect user id.");
+            return;
         }
+
+        if (usernameFromRequest.isBlank()) {
+            helper.sendBadRequestStatus("Empty username");
+            return;
+        }
+
+        if (userRepository.getById(userIdFromRequest) == null) {
+            helper.sendBadRequestStatus("User not found.");
+            return;
+        }
+
+        User user = new User();
+        user.setId(userIdFromRequest);
+        user.setName(usernameFromRequest);
+
+        user = userRepository.update(user);
+
+        helper.setResponseHead("User details");
+        helper.addH1ToResponseBody("User was updated successfully");
+
+        helper.addToResponseBody("User ID: " + user.getId());
+        helper.addToResponseBody("User name: " + user.getName());
+        helper.addToResponseBody("<br/>");
+
+        helper.sendResponse();
     }
 
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
