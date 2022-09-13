@@ -3,6 +3,7 @@ package org.yolkin.servlet;
 import org.yolkin.model.User;
 import org.yolkin.repository.UserRepository;
 import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
+import org.yolkin.util.ServletHelper;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,45 +19,32 @@ public class UserServlet extends HttpServlet {
         userRepository = new HibernateUserRepositoryImpl();
     }
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try (PrintWriter writer = response.getWriter()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            Long userId;
+        ServletHelper helper = new ServletHelper(response);
+
+        Long userId;
 
             try {
                 userId = Long.valueOf(request.getHeader("user_id"));
             } catch (Exception e) {
-                stringBuilder.append("Incorrect user id.");
-                writer.println(stringBuilder);
+                helper.sendBadRequestStatus("Incorrect user id.");
                 return;
             }
 
             User user = userRepository.getById(userId);
 
-            stringBuilder.append("<!DOCTYPE = html>");
-            stringBuilder.append("<html>");
-            stringBuilder.append("<head><title>");
-            stringBuilder.append("<h1>User details</h1>");
-            stringBuilder.append("</title></head>");
-
-            stringBuilder.append("<body>");
-            stringBuilder.append("<h1>User details</h1>");
+            helper.setResponseHead("User details");
 
             if (user == null) {
-                response.setStatus(400);
-                stringBuilder.append("User not found");
+                helper.sendBadRequestStatus("User not found");
+                return;
             } else {
-                stringBuilder.append("User ID: " + user.getId());
-                stringBuilder.append("<br/>");
-                stringBuilder.append("User name: " + user.getName());
-                stringBuilder.append("<br/>");
-                stringBuilder.append("<br/>");
-
-                stringBuilder.append("</body>");
-                stringBuilder.append("</html>");
+                helper.addH1ToResponseBody("User details");
+                helper.addToResponseBody("User ID: " + user.getId());
+                helper.addToResponseBody("User name: " + user.getName());
+                helper.addToResponseBody("<br/>");
             }
 
-            writer.println(stringBuilder);
-        }
+            helper.sendResponse();
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
