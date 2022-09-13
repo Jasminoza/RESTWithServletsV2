@@ -39,17 +39,28 @@ public class UserRestControllerV1 extends HttpServlet {
                 if (user != null) {
                     helper.sendJsonFrom(user);
                 } else {
-                    resp.sendError(404, "There is no user with such id.");
+                    resp.sendError(404, "There is no user with such id");
                 }
             } catch (Exception e) {
-                resp.sendError(400, "Incorrect user id.");
+                resp.sendError(400, "Incorrect user id");
             }
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        GsonHelper helper = new GsonHelper(resp);
 
+        String username = req.getHeader("username");
+
+        if (username == null || username.isBlank()) {
+            resp.sendError(400, "Username can't be null");
+        } else {
+            User user = new User();
+            user.setName(username);
+            user = userService.create(user);
+            helper.sendJsonFrom(user);
+        }
     }
 
     @Override
