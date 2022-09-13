@@ -1,6 +1,5 @@
 package org.yolkin.rest;
 
-import org.yolkin.model.User;
 import org.yolkin.service.UserService;
 import org.yolkin.util.GsonHelper;
 
@@ -24,23 +23,17 @@ public class UserRestControllerV1 extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         GsonHelper helper = new GsonHelper(resp, req);
 
-        String url = req.getRequestURL().toString();
-        String id = url.substring(url.indexOf("/users") + 6);
+        String id = req.getHeader("user_id");
 
-        if (id.isBlank()) {
+        if (id == null) {
             helper.sendJsonFrom(userService.getAll());
         } else {
-            Long idFromRequest;
-
             try {
-                idFromRequest = Long.valueOf(id);
+                Long idFromRequest = Long.valueOf(id);
+                helper.sendJsonFrom(userService.getById(idFromRequest));
             } catch (Exception e) {
                 helper.sendBadRequestStatus("Incorrect user id.");
-                return;
             }
-
-            User user = userService.getById(idFromRequest);
-            helper.sendJsonFrom(user);
         }
     }
 
