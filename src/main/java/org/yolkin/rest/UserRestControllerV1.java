@@ -84,11 +84,8 @@ public class UserRestControllerV1 extends HttpServlet {
                 User user = userService.getById(idFromRequest);
 
                 if (user != null) {
-                    User updatedUser = new User();
-                    updatedUser.setId(idFromRequest);
-                    updatedUser.setName(username);
-                    updatedUser = userService.update(updatedUser);
-                    helper.sendJsonFrom(updatedUser);
+                    User updatedUser = new User(idFromRequest, username);
+                    helper.sendJsonFrom(userService.update(updatedUser));
                 } else {
                     resp.sendError(404, "There is no user with such id");
                 }
