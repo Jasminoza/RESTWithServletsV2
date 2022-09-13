@@ -11,18 +11,8 @@
   </servlet>
 
   <servlet>
-    <servlet-name>User</servlet-name>
-    <servlet-class>org.yolkin.servlet.UserServlet</servlet-class>
-  </servlet>
-
-  <servlet>
     <servlet-name>Files</servlet-name>
     <servlet-class>org.yolkin.servlet.FilesServlet</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>File</servlet-name>
-    <servlet-class>org.yolkin.servlet.FileServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -30,40 +20,21 @@
     <servlet-class>org.yolkin.servlet.EventsServlet</servlet-class>
   </servlet>
 
-  <servlet>
-    <servlet-name>Event</servlet-name>
-    <servlet-class>org.yolkin.servlet.EventServlet</servlet-class>
-  </servlet>
 <!--  ========================================================================================================  -->
 
   <servlet-mapping>
     <servlet-name>Users</servlet-name>
-    <url-pattern>/users</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>User</servlet-name>
-    <url-pattern>/user</url-pattern>
+    <url-pattern>/api/v1/users</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>Files</servlet-name>
-    <url-pattern>/files</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>File</servlet-name>
-    <url-pattern>/file</url-pattern>
+    <url-pattern>/api/v1/files</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>Events</servlet-name>
-    <url-pattern>/events</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>Event</servlet-name>
-    <url-pattern>/event</url-pattern>
+    <url-pattern>/api/v1/events</url-pattern>
   </servlet-mapping>
 
 </web-app>

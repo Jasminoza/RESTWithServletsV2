@@ -22,6 +22,9 @@ public class Event {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<File> files;
 
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Event() {
     }
 

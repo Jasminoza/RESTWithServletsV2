@@ -15,7 +15,7 @@ public class User {
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<File> files;
+    private List<Event> events;
 
     public User() {
     }
@@ -36,19 +36,11 @@ public class User {
         this.name = name;
     }
 
-    public List<File> getFiles() {
-        return files;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public void setFiles(List<File> files) {
-        this.files = files;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+    public void setEvents(List<Event> files) {
+        this.events = files;
     }
 }
