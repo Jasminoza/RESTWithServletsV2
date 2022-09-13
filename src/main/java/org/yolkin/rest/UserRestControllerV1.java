@@ -55,10 +55,7 @@ public class UserRestControllerV1 extends HttpServlet {
         if (username == null || username.isBlank()) {
             resp.sendError(400, "Username can't be null");
         } else {
-            User user = new User();
-            user.setName(username);
-            user = userService.create(user);
-            helper.sendJsonFrom(user);
+            helper.sendJsonFrom(userService.create(new User(username)));
         }
     }
 
