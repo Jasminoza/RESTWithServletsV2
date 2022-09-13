@@ -1,7 +1,6 @@
 package org.yolkin.servlet;
 
 import org.yolkin.model.Event;
-import org.yolkin.model.File;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.util.ServletHelper;
@@ -10,9 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class EventsServlet extends HttpServlet {
 
@@ -31,27 +28,11 @@ public class EventsServlet extends HttpServlet {
 
         helper.addH1ToResponseBody("EVENTS DATA");
 
-        Map<Event, List<File>> filesByEvents = new HashMap<>();
         for (Event event : events) {
-            if (!filesByEvents.containsKey(event)) {
-                filesByEvents.put(event, event.getFiles());
-            } else {
-                List<File> addedFiles = filesByEvents.get(event);
-                for (File file : event.getFiles()) {
-                    if (!addedFiles.contains(file)) {
-                        addedFiles.add(file);
-                    }
-                }
-                filesByEvents.put(event, addedFiles);
-            }
+            helper.addH3ToResponseBody("Event ID: " + event.getId());
+            helper.addToResponseBody("Event files: " + event.getFiles());
+            helper.addToResponseBody("<br/>");
         }
-
-        filesByEvents.entrySet().forEach( entry ->
-                {
-                 helper.addToResponseBody(
-                                 entry.getKey().toString() + entry.getValue().toString() + "\n\n");
-                }
-        );
 
         helper.sendResponse();
     }

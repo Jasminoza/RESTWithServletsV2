@@ -67,4 +67,13 @@ public class File {
     public void setEvents(List<Event> events) {
         this.events = events;
     }
+
+    @Override
+    public String toString() {
+        return "File{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", dateOfUploading=" + dateOfUploading +
+                ", user=" + user + '}';
+    }
 }
