@@ -2,7 +2,6 @@ package org.yolkin.util;
 
 import com.google.gson.Gson;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 

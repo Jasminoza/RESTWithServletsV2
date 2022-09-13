@@ -31,17 +31,16 @@ public class UserRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(userService.getAll());
         } else {
-            Long idFromRequest;
-
             try {
-                idFromRequest = Long.valueOf(id);
+                Long idFromRequest = Long.valueOf(id);
                 User user = userService.getById(idFromRequest);
+
                 if (user != null) {
                     helper.sendJsonFrom(user);
                 } else {
                     resp.sendError(404, "There is no user with such id");
                 }
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 resp.sendError(400, "Incorrect user id");
             }
         }
@@ -65,7 +64,38 @@ public class UserRestControllerV1 extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        GsonHelper helper = new GsonHelper(resp);
 
+        String url = req.getRequestURL().toString();
+        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
+
+        if (id.isBlank()) {
+            resp.sendError(400, "User id can't be null");
+        } else {
+            try {
+                Long idFromRequest = Long.valueOf(id);
+
+                String username = req.getHeader("username");
+
+                if (username == null || username.isBlank()) {
+                    resp.sendError(400, "Username can't be null");
+                }
+
+                User user = userService.getById(idFromRequest);
+
+                if (user != null) {
+                    User updatedUser = new User();
+                    updatedUser.setId(idFromRequest);
+                    updatedUser.setName(username);
+                    updatedUser = userService.update(updatedUser);
+                    helper.sendJsonFrom(updatedUser);
+                } else {
+                    resp.sendError(404, "There is no user with such id");
+                }
+            } catch (NumberFormatException e) {
+                resp.sendError(400, "Incorrect user id");
+            }
+        }
     }
 
     @Override
