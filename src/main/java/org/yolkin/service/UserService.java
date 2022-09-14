@@ -100,11 +100,11 @@ public class UserService {
                 Long idFromRequest = Long.valueOf(id);
                 User user = userRepository.getById(idFromRequest);
 
-                if (user != null) {
+                if (user == null) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+                } else {
                     userRepository.delete(idFromRequest);
                     resp.setStatus(HttpServletResponse.SC_OK);
-                } else {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
                 }
             } catch (NumberFormatException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");

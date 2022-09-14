@@ -127,7 +127,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.getById("sdfgnf", response);
 
         assertNull(userFromService);
-        verify(userRepository, never()).getById(Mockito.any());
+        verify(userRepository, never()).getById(any());
         verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
     }
 
@@ -138,7 +138,7 @@ public class UserServiceTest extends Mockito {
 
         assertNull(userFromService);
         verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
-        verify(userRepository, never()).getById(Mockito.any());
+        verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
 
@@ -150,7 +150,7 @@ public class UserServiceTest extends Mockito {
 
         assertNull(userFromService);
         verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
-        verify(userRepository, never()).getById(Mockito.any());
+        verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
 
@@ -167,13 +167,13 @@ public class UserServiceTest extends Mockito {
     }
 
     @Test
-    public void updateFailedIncorrectId() throws IOException {
+    public void updateFailedIncorrectUserId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
         User userFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(userFromService);
         verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
-        verify(userRepository, never()).getById(Mockito.any());
+        verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
 
@@ -195,5 +195,46 @@ public class UserServiceTest extends Mockito {
         verify(response, never()).sendError(Mockito.anyInt(), Mockito.anyString());
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).update(userAfterUpdate);
+    }
+
+    @Test
+    public void deleteFailedBlankUserId() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
+        serviceUnderTest.delete(request, response, mappingUrl);
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
+        verify(userRepository, never()).getById(any());
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    public void deleteFailedUserNotFound() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
+        serviceUnderTest.delete(request, response, mappingUrl);
+
+        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+        verify(userRepository, times(1)).getById(100L);
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    public void deleteFailedIncorrectUserId() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
+        serviceUnderTest.delete(request, response, mappingUrl);
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+        verify(userRepository, never()).getById(any());
+        verify(userRepository, never()).update(any());
+    }
+
+    @Test
+    public void deleteSuccess() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
+        when(userRepository.getById(1L)).thenReturn(getUserWithId());
+        serviceUnderTest.delete(request, response, mappingUrl);
+
+        verify(userRepository, times(1)).getById(1L);
+        verify(userRepository, times(1)).delete(1L);
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
     }
 }
