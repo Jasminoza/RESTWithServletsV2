@@ -1,6 +1,5 @@
 package org.yolkin.rest;
 
-import org.yolkin.model.User;
 import org.yolkin.service.UserService;
 import org.yolkin.util.GsonHelper;
 
@@ -31,89 +30,24 @@ public class UserRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(userService.getAll());
         } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-                User user = userService.getById(idFromRequest);
-
-                if (user != null) {
-                    helper.sendJsonFrom(user);
-                } else {
-                    resp.sendError(404, "There is no user with such id");
-                }
-            } catch (NumberFormatException e) {
-                resp.sendError(400, "Incorrect user id");
-            }
+            helper.sendJsonFrom(userService.getById(id, resp));
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         GsonHelper helper = new GsonHelper(resp);
-
-        String username = req.getHeader("username");
-
-        if (username == null || username.isBlank()) {
-            resp.sendError(400, "Username can't be null");
-        } else {
-            helper.sendJsonFrom(userService.create(new User(username)));
-        }
+        helper.sendJsonFrom(userService.create(req, resp));
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         GsonHelper helper = new GsonHelper(resp);
-
-        String url = req.getRequestURL().toString();
-        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
-
-        if (id.isBlank()) {
-            resp.sendError(400, "User id can't be null");
-        } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-
-                String username = req.getHeader("username");
-
-                if (username == null || username.isBlank()) {
-                    resp.sendError(400, "Username can't be null");
-                }
-
-                User user = userService.getById(idFromRequest);
-
-                if (user != null) {
-                    User updatedUser = new User(idFromRequest, username);
-                    helper.sendJsonFrom(userService.update(updatedUser));
-                } else {
-                    resp.sendError(404, "There is no user with such id");
-                }
-            } catch (NumberFormatException e) {
-                resp.sendError(400, "Incorrect user id");
-            }
-        }
+        helper.sendJsonFrom(userService.update(req, resp, mappingUrl));
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String url = req.getRequestURL().toString();
-        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
-
-        if (id.isBlank()) {
-            resp.sendError(400, "User id can't be null");
-        } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-
-                User user = userService.getById(idFromRequest);
-
-                if (user != null) {
-                    userService.delete(idFromRequest);
-                    resp.setStatus(200);
-                } else {
-                    resp.sendError(404, "There is no user with such id");
-                }
-            } catch (NumberFormatException e) {
-                resp.sendError(400, "Incorrect user id");
-            }
-        }
+       userService.delete(req, resp, mappingUrl);
     }
 }
