@@ -184,4 +184,42 @@ public class UserRestControllerV1Test extends Mockito {
 
         verify(response).sendError(400, "Incorrect user id");
     }
+
+    @Test
+    public void doDeleteSuccess() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/1"));
+        when(userService.getById(1L)).thenReturn(new User(1L, "Eugene"));
+
+        controllerUnderTest.doDelete(request, response);
+
+        verify(userService).delete(1L);
+        verify(response).setStatus(200);
+    }
+
+    @Test
+    public void doDeleteFailedBlankUserId() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/"));
+
+        controllerUnderTest.doDelete(request, response);
+
+        verify(response).sendError(400, "User id can't be null");
+    }
+
+    @Test
+    public void doDeleteUserNotFound() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/20"));
+
+        controllerUnderTest.doDelete(request, response);
+
+        verify(response).sendError(404, "There is no user with such id");
+    }
+
+    @Test
+    public void doDeleteIncorrectUserId() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/erfgwe"));
+
+        controllerUnderTest.doDelete(request, response);
+
+        verify(response).sendError(400, "Incorrect user id");
+    }
 }
