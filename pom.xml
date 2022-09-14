@@ -19,6 +19,7 @@
     <maven.plugin.version>3.10.1</maven.plugin.version>
     <gson.version>2.9.1</gson.version>
     <junit.verion>5.9.0</junit.verion>
+    <mockito.version>4.8.0</mockito.version>
   </properties>
 
   <dependencies>
@@ -73,6 +74,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
