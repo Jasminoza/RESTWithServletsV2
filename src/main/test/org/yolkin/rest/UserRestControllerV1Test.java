@@ -128,4 +128,60 @@ public class UserRestControllerV1Test extends Mockito {
         verify(response).sendError(400, "Username can't be null");
         assertEquals("", result);
     }
+
+    @Test
+    public void doPutSuccess() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/1"));
+
+        User userBeforeUpdate = new User(1L, "Ivan");
+        User userAfterUpdate = new User(1L, "Petya");
+        String userAfterUpdateAsString = "{\"id\":1,\"name\":\"Petya\"}";
+
+        when(request.getHeader("username")).thenReturn("Petya");
+        when(userService.getById(1L)).thenReturn(userBeforeUpdate);
+        when(userService.update(userAfterUpdate)).thenReturn(userAfterUpdate);
+
+        controllerUnderTest.doPut(request, response);
+        String result = writer.toString().trim();
+
+        verify(request).getHeader("username");
+        assertEquals(userAfterUpdateAsString, result);
+    }
+
+    @Test
+    public void doPutFailedBlankUserId() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/"));
+
+        controllerUnderTest.doPut(request, response);
+
+        verify(response).sendError(400, "User id can't be null");
+    }
+
+    @Test
+    public void doPutFailedBlankUserName() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/1"));
+        when(request.getHeader("username")).thenReturn(" ");
+
+        controllerUnderTest.doPut(request, response);
+
+        verify(response).sendError(400, "Username can't be null");
+    }
+
+    @Test
+    public void doPutFailedUserNotFound() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/20"));
+
+        controllerUnderTest.doPut(request, response);
+
+        verify(response).sendError(404, "There is no user with such id");
+    }
+
+    @Test
+    public void doPutFailedIncorrectUserId() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/erfgwe"));
+
+        controllerUnderTest.doPut(request, response);
+
+        verify(response).sendError(400, "Incorrect user id");
+    }
 }
