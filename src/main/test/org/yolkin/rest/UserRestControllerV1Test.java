@@ -3,6 +3,7 @@ package org.yolkin.rest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.yolkin.model.User;
 import org.yolkin.service.UserService;
@@ -12,14 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-public class UserRestControllerV1Test {
+public class UserRestControllerV1Test extends Mockito {
 
     @Mock
     private UserService userService;
@@ -55,7 +53,7 @@ public class UserRestControllerV1Test {
         when(userService.getAll()).thenReturn(getUsers());
         String getUsersAsString = "[{\"id\":1,\"name\":\"Petya\"},{\"id\":2,\"name\":\"Vasya\"}]";
 
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/"));
 
         controllerUnderTest.doGet(request, response);
         String result = writer.toString().trim();
@@ -68,7 +66,7 @@ public class UserRestControllerV1Test {
     public void doGetUserWithId1Success() throws IOException {
         when(userService.getById(1L)).thenReturn(new User(1L, "Eugene"));
         String userAsString = "{\"id\":1,\"name\":\"Eugene\"}";
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/1"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/1"));
 
         controllerUnderTest.doGet(request, response);
         String result = writer.toString().trim();
@@ -79,7 +77,7 @@ public class UserRestControllerV1Test {
 
     @Test
     public void doGetAllFailedIncorrectId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/sdgdf"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/sdgdf"));
 
         controllerUnderTest.doGet(request, response);
         String result = writer.toString().trim();
@@ -90,12 +88,44 @@ public class UserRestControllerV1Test {
 
     @Test
     public void doGetFailedNoUserWithSuchId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/20"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/20"));
 
         controllerUnderTest.doGet(request, response);
         String result = writer.toString().trim();
 
         verify(response).sendError(404, "There is no user with such id");
+        assertEquals("", result);
+    }
+
+    @Test
+    public void doPostSuccess() throws IOException {
+        User userWithoutId = new User("Ivan");
+        User userWithId = new User(1L, "Ivan");
+        String userWithIdAsString = "{\"id\":1,\"name\":\"Ivan\"}";
+
+        when(request.getHeader("username")).thenReturn("Ivan");
+        when(userService.create(userWithoutId)).thenReturn(userWithId);
+
+        controllerUnderTest.doPost(request, response);
+        String result = writer.toString().trim();
+
+        verify(request).getHeader("username");
+        verify(response).setContentType("application/json");
+        assertEquals(userWithIdAsString, result);
+    }
+
+    @Test
+    public void doPostFailedBlankUsername() throws IOException {
+        User userWithoutId = new User("Ivan");
+        User userWithId = new User(1L, "Ivan");
+        when(request.getHeader("username")).thenReturn(" ");
+        when(userService.create(userWithoutId)).thenReturn(userWithId);
+
+        controllerUnderTest.doPost(request, response);
+        String result = writer.toString().trim();
+
+        verify(request).getHeader("username");
+        verify(response).sendError(400, "Username can't be null");
         assertEquals("", result);
     }
 }

@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class UserRestControllerV1 extends HttpServlet {
     private final UserService userService;
-    private final String mappingUrl = "/users/";
+    private final String mappingUrl = "api/v1/users/";
 
     public UserRestControllerV1() {
         userService = new UserService();
