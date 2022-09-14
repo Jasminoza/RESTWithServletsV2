@@ -46,7 +46,7 @@ public class UserRestControllerV1Test extends Mockito {
 
         verify(response).setContentType("application/json;charset=UTF-8");
         verify(userService, times(1)).getAll();
-
+        verify(userService, never()).getById(any(), any());
     }
 
     @Test
