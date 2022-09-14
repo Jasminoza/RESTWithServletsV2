@@ -1,17 +1,14 @@
 package org.yolkin.rest;
 
-import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.yolkin.model.User;
 import org.yolkin.service.UserService;
-import org.yolkin.util.GsonHelper;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -30,6 +27,8 @@ public class UserRestControllerV1Test {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+    private StringWriter writer;
+    private PrintWriter printWriter;
     private UserRestControllerV1 controllerUnderTest;
 
     public UserRestControllerV1Test() {
@@ -37,57 +36,65 @@ public class UserRestControllerV1Test {
         this.controllerUnderTest = new UserRestControllerV1(userService);
     }
 
+    @BeforeEach
+    public void setWriter() throws IOException {
+        writer = new StringWriter();
+        printWriter = new PrintWriter(writer);
+        when(response.getWriter()).thenReturn(printWriter);
+    }
+
     private List<User> getUsers() {
-        List<User> users = new ArrayList<>();
-        users.add(new User(1L, "Petya"));
-        users.add(new User(2L, "Vasya"));
-        return users;
+        return List.of(
+                new User(1L, "Petya"),
+                new User(2L, "Vasya")
+        );
     }
 
     @Test
     public void doGetAllSuccess() throws IOException {
         when(userService.getAll()).thenReturn(getUsers());
+        String getUsersAsString = "[{\"id\":1,\"name\":\"Petya\"},{\"id\":2,\"name\":\"Vasya\"}]";
+
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/"));
 
-        StringWriter writer = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(writer);
-        when(response.getWriter()).thenReturn(printWriter);
+        controllerUnderTest.doGet(request, response);
+        String result = writer.toString().trim();
+
+        verify(response).setContentType("application/json");
+        assertEquals(getUsersAsString, result);
+    }
+
+    @Test
+    public void doGetUserWithId1Success() throws IOException {
+        when(userService.getById(1L)).thenReturn(new User(1L, "Eugene"));
+        String userAsString = "{\"id\":1,\"name\":\"Eugene\"}";
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/1"));
 
         controllerUnderTest.doGet(request, response);
-
         String result = writer.toString().trim();
+
         verify(response).setContentType("application/json");
-        assertEquals("[{\"id\":1,\"name\":\"Petya\"},{\"id\":2,\"name\":\"Vasya\"}]", result);
+        assertEquals(userAsString, result);
     }
 
     @Test
     public void doGetAllFailedIncorrectId() throws IOException {
-        when(userService.getAll()).thenReturn(getUsers());
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/sdgdf"));
 
-        StringWriter writer = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(writer);
-        when(response.getWriter()).thenReturn(printWriter);
-
         controllerUnderTest.doGet(request, response);
-
         String result = writer.toString().trim();
+
         verify(response).sendError(400, "Incorrect user id");
         assertEquals("", result);
     }
 
     @Test
-    public void doGetAllFailedNoUserWithSuchId() throws IOException {
-        when(userService.getAll()).thenReturn(getUsers());
+    public void doGetFailedNoUserWithSuchId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/users/20"));
 
-        StringWriter writer = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(writer);
-        when(response.getWriter()).thenReturn(printWriter);
-
         controllerUnderTest.doGet(request, response);
-
         String result = writer.toString().trim();
+
         verify(response).sendError(404, "There is no user with such id");
         assertEquals("", result);
     }
