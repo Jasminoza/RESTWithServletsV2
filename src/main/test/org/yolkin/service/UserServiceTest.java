@@ -88,6 +88,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.create(request, response);
 
         verify(request).getHeader("username");
+        verify(response).setStatus(HttpServletResponse.SC_CREATED);
         assertEquals(userWithId, userFromService);
     }
 

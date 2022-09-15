@@ -25,17 +25,18 @@ public class UserService {
     }
 
     public User create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        User user = null;
         String username = req.getHeader("username");
 
         if (username == null || username.isBlank()) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
+            return null;
         } else {
-            user = new User();
+            User user = new User();
             user.setName(username);
             user = userRepository.create(user);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+            return user;
         }
-        return user;
     }
 
     public User getById(String id, HttpServletResponse resp) throws IOException {
@@ -62,6 +63,7 @@ public class UserService {
 
         if (id.isBlank()) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
+            return null;
         } else {
             try {
                 Long idFromRequest = Long.valueOf(id);
@@ -70,14 +72,13 @@ public class UserService {
 
                 if (username == null || username.isBlank()) {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
-                    return user;
+                    return null;
                 }
-
                 user = userRepository.getById(idFromRequest);
 
                 if (user == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
-                    return user;
+                    return null;
                 } else {
                     user.setName(username);
                     user = userRepository.update(user);

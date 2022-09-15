@@ -1,6 +1,5 @@
 package org.yolkin.rest;
 
-import org.yolkin.model.File;
 import org.yolkin.service.FileService;
 import org.yolkin.util.GsonHelper;
 
@@ -32,41 +31,24 @@ public class FileRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(fileService.getAll());
         } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-                File file = fileService.getById(idFromRequest);
-
-                if (file != null) {
-                    helper.sendJsonFrom(file);
-                } else {
-                    resp.sendError(404, "There is no file with such id");
-                }
-            } catch (Exception e) {
-                resp.sendError(400, "Incorrect file id");
-            }
+            helper.sendJsonFrom(fileService.getById(id, resp));
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         GsonHelper helper = new GsonHelper(resp);
-
-        String username = req.getHeader("user_id");
-
-        if (username == null || username.isBlank()) {
-            resp.sendError(400, "Username can't be null");
-        } else {
-            helper.sendJsonFrom(fileService.create(new File()));
-        }
+        helper.sendJsonFrom(fileService.create(req, resp));
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
+        GsonHelper helper = new GsonHelper(resp);
+//        helper.sendJsonFrom(fileService.update());
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
+//        fileService.delete();
     }
 }
