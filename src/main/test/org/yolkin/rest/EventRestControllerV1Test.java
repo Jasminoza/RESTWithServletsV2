@@ -60,7 +60,7 @@ public class EventRestControllerV1Test extends Mockito {
     }
 
     @Test
-    public void doDetele() throws IOException {
+    public void doDelete() throws IOException {
         controllerUnderTest.doDelete(request, response);
 
         verify(eventService, times(1)).delete(request, response, mappingUrl);

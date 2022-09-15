@@ -28,19 +28,6 @@ public class File {
     public File() {
     }
 
-    public File(Long id, String name, String filepath, Date dateOfUploading) {
-        this.id = id;
-        this.name = name;
-        this.filepath = filepath;
-        this.dateOfUploading = dateOfUploading;
-    }
-
-    public File(String name, String filepath, Date dateOfUploading) {
-        this.name = name;
-        this.filepath = filepath;
-        this.dateOfUploading = dateOfUploading;
-    }
-
     public Long getId() {
         return id;
     }
