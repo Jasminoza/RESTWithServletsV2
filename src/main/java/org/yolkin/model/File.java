@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table (name = "files")
+@Table(name = "files")
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,14 +14,13 @@ public class File {
     @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "file_path")
     private String filepath;
 
     @Column(name = "date_of_uploading")
     private Date dateOfUploading;
 
-    @ManyToOne
-    @JoinColumn(name = "event_id")
+    @OneToOne(mappedBy = "file")
     private Event event;
 
     public File() {

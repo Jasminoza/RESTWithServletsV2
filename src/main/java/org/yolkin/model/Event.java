@@ -1,10 +1,6 @@
 package org.yolkin.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-
-import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -13,14 +9,9 @@ public class Event {
     @GeneratedValue(generator = "increment")
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "events_files",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "file_id")
-    )
-    @LazyCollection(LazyCollectionOption.FALSE)
-    private List<File> files;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "file_id", referencedColumnName = "id")
+    private File file;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -37,12 +28,12 @@ public class Event {
         this.id = id;
     }
 
-    public List<File> getFiles() {
-        return files;
+    public File getFile() {
+        return file;
     }
 
-    public void setFiles(List<File> files) {
-        this.files = files;
+    public void setFile(File file) {
+        this.file = file;
     }
 
     public User getUser() {

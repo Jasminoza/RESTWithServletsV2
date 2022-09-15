@@ -3,7 +3,6 @@ package org.yolkin.service;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.yolkin.model.Event;
 import org.yolkin.model.File;
 import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
@@ -13,7 +12,6 @@ import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateFileRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
 import org.yolkin.util.ServiceHelper;
-import org.yolkin.util.ServletHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,17 +49,17 @@ public class FileService {
         ServiceHelper helper = new ServiceHelper();
         List<File> filesList = new ArrayList<>();
 
-        String username = req.getHeader("user_id");
+        String idFromRequest = req.getHeader("user_id");
 
-        if (username == null || username.isBlank()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
+        if (idFromRequest == null || idFromRequest.isBlank()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
             return null;
         }
 
         Long userIdFromRequest;
 
         try {
-            userIdFromRequest = Long.valueOf(username);
+            userIdFromRequest = Long.valueOf(idFromRequest);
         } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id.");
             return null;
@@ -77,13 +75,9 @@ public class FileService {
         ServletFileUpload uploader = helper.setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
         try {
             Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
-            Event event = new Event();
-            event.setUser(user);
-
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 FileItem fileItem = iterator.next();
                 Date date = new Date();
-                List<File> files = new ArrayList<>();
 
                 if (!fileItem.isFormField()) {
                     java.io.File realFile = helper.getFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
@@ -93,18 +87,8 @@ public class FileService {
                         fileForDB.setDateOfUploading(date);
                         fileForDB.setFilepath(realFile.getPath());
 
-                        files.add(fileForDB);
-                        event.setFiles(files);
-                        if (files.size() == 1) {
-                          event = eventRepository.create(event);
-                        } else {
-                          event = eventRepository.update(event);
-                        }
-
-                        fileForDB.setEvent(event);
                         fileForDB = fileRepository.create(fileForDB);
                         filesList.add(fileForDB);
-
                         fileItem.write(realFile);
 
                     } catch (Exception e) {
@@ -113,9 +97,8 @@ public class FileService {
                     }
                 }
             }
-
         } catch (FileUploadException e) {
-            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Can't parse files from request");
+            resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "The size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
         }
         resp.setStatus(HttpServletResponse.SC_CREATED);
         return filesList;

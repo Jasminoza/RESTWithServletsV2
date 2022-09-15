@@ -16,6 +16,7 @@ public class ServiceHelper {
 
         ServletFileUpload uploader = new ServletFileUpload(diskFileItemFactory);
         uploader.setSizeMax(MAX_FILE_SIZE);
+        uploader.setFileSizeMax(MAX_MEMORY_SIZE);
         return uploader;
     }
 
