@@ -15,10 +15,10 @@
     <servlet-class>org.yolkin.rest.FileRestControllerV1</servlet-class>
   </servlet>
 
-<!--  <servlet>-->
-<!--    <servlet-name>Events</servlet-name>-->
-<!--    <servlet-class>org.yolkin.servlet.EventsServlet</servlet-class>-->
-<!--  </servlet>-->
+  <servlet>
+    <servlet-name>Events</servlet-name>
+    <servlet-class>org.yolkin.rest.EventRestControllerV1</servlet-class>
+  </servlet>
 
 <!--  ========================================================================================================  -->
 
@@ -32,9 +32,9 @@
     <url-pattern>/api/v1/files/*</url-pattern>
   </servlet-mapping>
 
-<!--  <servlet-mapping>-->
-<!--    <servlet-name>Events</servlet-name>-->
-<!--    <url-pattern>/api/v1/events/*</url-pattern>-->
-<!--  </servlet-mapping>-->
+  <servlet-mapping>
+    <servlet-name>Events</servlet-name>
+    <url-pattern>/api/v1/events/*</url-pattern>
+  </servlet-mapping>
 
 </web-app>

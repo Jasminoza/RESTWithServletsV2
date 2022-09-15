@@ -3,12 +3,14 @@ package org.yolkin.model;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "files")
 public class File {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "increment")
     private Long id;
 
     @Column(name = "name")
@@ -20,8 +22,8 @@ public class File {
     @Column(name = "date_of_uploading")
     private Date dateOfUploading;
 
-    @OneToOne(mappedBy = "file")
-    private Event event;
+    @ManyToMany(mappedBy = "files")
+    private List<Event> events;
 
     public File() {
     }
@@ -71,11 +73,24 @@ public class File {
         this.dateOfUploading = dateOfUploading;
     }
 
-    public Event getEvent() {
-        return event;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        File file = (File) o;
+        return Objects.equals(id, file.id) && Objects.equals(name, file.name) && Objects.equals(filepath, file.filepath) && Objects.equals(dateOfUploading, file.dateOfUploading);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, filepath, dateOfUploading);
     }
 }

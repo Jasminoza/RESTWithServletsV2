@@ -1,10 +1,13 @@
 package org.yolkin.service;
 
 import org.yolkin.model.Event;
-import org.yolkin.model.File;
+import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 public class EventService {
@@ -23,19 +26,43 @@ public class EventService {
         return eventRepository.getAll();
     }
 
-    public Event create(Event event) {
-        return eventRepository.create(event);
+    public Event getById(String id, HttpServletResponse resp) throws IOException {
+        Event event = null;
+
+        try {
+            Long idFromRequest = Long.valueOf(id);
+            event = eventRepository.getById(idFromRequest);
+
+            if (event == null) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+            }
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
+        }
+
+        return event;
     }
 
-    public Event getById(Long id) {
-        return eventRepository.getById(id);
-    }
+    public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+        String url = req.getRequestURL().toString();
+        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 
-    public Event update(Event event) {
-        return eventRepository.update(event);
-    }
+        if (id.isBlank()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Event id can't be null");
+        } else {
+            try {
+                Long idFromRequest = Long.valueOf(id);
+                Event event = eventRepository.getById(idFromRequest);
 
-    public void delete(Long id) {
-        eventRepository.delete(id);
+                if (event == null) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+                } else {
+                    eventRepository.delete(idFromRequest);
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                }
+            } catch (NumberFormatException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
+            }
+        }
     }
 }

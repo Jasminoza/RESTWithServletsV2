@@ -2,18 +2,20 @@ package org.yolkin.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+import java.util.Objects;
+
 @Entity
-@Table(name = "events")
+@Table(name = "users_files")
 public class Event {
     @Id
     @GeneratedValue(generator = "increment")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "file_id", referencedColumnName = "id")
-    private File file;
+    @ManyToMany(cascade = CascadeType.ALL)
 
-    @ManyToOne
+    private List<File> files;
+
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -28,12 +30,12 @@ public class Event {
         this.id = id;
     }
 
-    public File getFile() {
-        return file;
+    public List<File> getFiles() {
+        return files;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setFiles(List<File> files) {
+        this.files = files;
     }
 
     public User getUser() {
@@ -42,5 +44,18 @@ public class Event {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(id, event.id) && Objects.equals(files, event.files) && Objects.equals(user, event.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, files, user);
     }
 }
