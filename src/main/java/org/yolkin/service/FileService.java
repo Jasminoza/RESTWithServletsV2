@@ -27,6 +27,7 @@ public class FileService {
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final ServiceHelper helper;
     static final int MAX_FILE_SIZE = 100 * 1024;
     static final int MAX_MEMORY_SIZE = 100 * 1024;
     private final String PATH_FOR_UPLOADING = "src/main/webapp/uploads";
@@ -35,12 +36,14 @@ public class FileService {
         fileRepository = new HibernateFileRepositoryImpl();
         userRepository = new HibernateUserRepositoryImpl();
         eventRepository = new HibernateEventRepositoryImpl();
+        helper = new ServiceHelper(eventRepository);
     }
 
-    public FileService(FileRepository fileRepository, UserRepository userRepository, EventRepository eventRepository) {
+    public FileService(FileRepository fileRepository, UserRepository userRepository, EventRepository eventRepository, ServiceHelper helper) {
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
+        this.helper = helper;
     }
 
     public List<File> getAll() {
@@ -48,7 +51,6 @@ public class FileService {
     }
 
     public File create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ServiceHelper helper = new ServiceHelper();
         File file = null;
 
         String idFromRequest = req.getHeader("user_id");
@@ -127,8 +129,6 @@ public class FileService {
     }
 
     public File update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper();
-
         File file = null;
 
         String url = req.getRequestURL().toString();
@@ -163,6 +163,9 @@ public class FileService {
 
                                     file = fileRepository.update(fileForDB);
                                     fileItem.write(realFile);
+
+                                    Event event = new Event();
+//                                    event.setEvent();// TODO::
 
                                     resp.setStatus(SC_CREATED);
 

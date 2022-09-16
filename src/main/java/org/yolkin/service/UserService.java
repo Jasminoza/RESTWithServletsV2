@@ -1,8 +1,11 @@
 package org.yolkin.service;
 
 import org.yolkin.model.User;
+import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.UserRepository;
+import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
+import org.yolkin.util.ServiceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,13 +17,19 @@ import static javax.servlet.http.HttpServletResponse.*;
 
 public class UserService {
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final ServiceHelper helper;
 
     public UserService() {
         userRepository = new HibernateUserRepositoryImpl();
+        eventRepository = new HibernateEventRepositoryImpl();
+        helper = new ServiceHelper(eventRepository);
     }
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, EventRepository eventRepository, ServiceHelper helper) {
         this.userRepository = userRepository;
+        this.eventRepository = eventRepository;
+        this.helper = helper;
     }
 
     public List<User> getAll() {
@@ -37,6 +46,9 @@ public class UserService {
             User user = new User();
             user.setName(username);
             user = userRepository.create(user);
+
+            helper.makeCreateUserEvent(user);
+
             resp.setStatus(SC_CREATED);
             return user;
         }

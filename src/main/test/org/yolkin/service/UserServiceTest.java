@@ -6,7 +6,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.yolkin.model.User;
+import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.UserRepository;
+import org.yolkin.util.ServiceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,9 +26,12 @@ public class UserServiceTest extends Mockito {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private EventRepository eventRepository;
+    @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+    private ServiceHelper helper;
     private StringWriter writer;
     private PrintWriter printWriter;
     private UserService serviceUnderTest;
@@ -34,11 +39,12 @@ public class UserServiceTest extends Mockito {
 
     public UserServiceTest() {
         MockitoAnnotations.openMocks(this);
-        this.serviceUnderTest = new UserService(userRepository);
+        this.serviceUnderTest = new UserService(userRepository, eventRepository, helper);
     }
 
     @BeforeEach
     public void setWriter() throws IOException {
+        helper = new ServiceHelper(eventRepository);
         writer = new StringWriter();
         printWriter = new PrintWriter(writer);
         when(response.getWriter()).thenReturn(printWriter);
@@ -237,6 +243,6 @@ public class UserServiceTest extends Mockito {
 
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).delete(1L);
-        verify(response, times(1)).setStatus(SC_OK);
+        verify(response, times(1)).setStatus(SC_NO_CONTENT);
     }
 }

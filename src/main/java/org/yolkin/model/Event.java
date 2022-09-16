@@ -13,6 +13,9 @@ public class Event {
     @GeneratedValue(generator = "increment")
     private Long id;
 
+    @Column(name = "event")
+    private String event;
+
     @ManyToMany(mappedBy = "events")
     private List<User> users = new ArrayList<>();
 
@@ -25,6 +28,14 @@ public class Event {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
     }
 
     public List<User> getUsers() {

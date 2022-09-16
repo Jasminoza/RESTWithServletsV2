@@ -1,9 +1,9 @@
 package org.yolkin.service;
 
 import org.yolkin.model.Event;
-import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
+import org.yolkin.util.ServiceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,13 +15,16 @@ import static javax.servlet.http.HttpServletResponse.*;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final ServiceHelper helper;
 
     public EventService() {
         eventRepository = new HibernateEventRepositoryImpl();
+        helper = new ServiceHelper(eventRepository);
     }
 
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, ServiceHelper helper) {
         this.eventRepository = eventRepository;
+        this.helper = helper;
     }
 
     public List<Event> getAll() {
