@@ -47,7 +47,7 @@ public class FileRestControllerV1Test extends Mockito {
     }
 
     @Test
-    public void doGetAllSuccess() throws IOException {
+    public void doGetAll() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/"));
         controllerUnderTest.doGet(request, response);
 
