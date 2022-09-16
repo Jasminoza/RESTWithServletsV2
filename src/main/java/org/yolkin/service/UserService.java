@@ -12,9 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import static javax.servlet.http.HttpServletResponse.*;
-
-
 public class UserService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
