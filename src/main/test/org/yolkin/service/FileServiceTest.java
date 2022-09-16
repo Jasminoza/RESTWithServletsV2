@@ -211,7 +211,7 @@ public class FileServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/files/"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "File id can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(fileRepository, never()).getById(any());
         verify(fileRepository, never()).delete(any());
     }

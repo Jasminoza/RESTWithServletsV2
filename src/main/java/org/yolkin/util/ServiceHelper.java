@@ -232,8 +232,16 @@ public class ServiceHelper {
         return true;
     }
 
-
     public File getFileById() {
         return fileFromRepo;
+    }
+
+    public boolean fileServiceDeleteRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
+    }
+
+    public void deleteFile() {
+        resp.setStatus(SC_NO_CONTENT);
+        fileRepository.delete(idFromRequest);
     }
 }

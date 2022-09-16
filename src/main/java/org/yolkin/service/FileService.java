@@ -183,25 +183,10 @@ public class FileService {
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        String url = req.getRequestURL().toString();
-        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
+        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, req, resp, mappingUrl);
 
-        if (id.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, "File id can't be null");
-        } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-                File file = fileRepository.getById(idFromRequest);
-
-                if (file == null) {
-                    resp.sendError(SC_NOT_FOUND, "There is no file with such id");
-                } else {
-                    fileRepository.delete(idFromRequest);
-                    resp.setStatus(SC_NO_CONTENT);
-                }
-            } catch (NumberFormatException e) {
-                resp.sendError(SC_BAD_REQUEST, "Incorrect file id");
-            }
+        if (helper.fileServiceDeleteRequestIsCorrect()) {
+            helper.deleteFile();
         }
     }
 }
