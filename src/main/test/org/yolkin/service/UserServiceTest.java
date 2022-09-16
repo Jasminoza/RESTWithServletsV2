@@ -39,12 +39,12 @@ public class UserServiceTest extends Mockito {
 
     public UserServiceTest() {
         MockitoAnnotations.openMocks(this);
-        this.serviceUnderTest = new UserService(userRepository, eventRepository, helper);
+        this.serviceUnderTest = new UserService(userRepository, eventRepository);
     }
 
     @BeforeEach
     public void setWriter() throws IOException {
-        helper = new ServiceHelper(eventRepository);
+        helper = new ServiceHelper(eventRepository, userRepository, response, request);
         writer = new StringWriter();
         printWriter = new PrintWriter(writer);
         when(response.getWriter()).thenReturn(printWriter);
@@ -94,8 +94,8 @@ public class UserServiceTest extends Mockito {
 
         User userFromService = serviceUnderTest.create(request, response);
 
-        verify(request).getHeader("username");
         verify(response).setStatus(SC_CREATED);
+        verify(response, never()).sendError(anyInt(), anyString());
         assertEquals(userWithId, userFromService);
     }
 
@@ -106,14 +106,14 @@ public class UserServiceTest extends Mockito {
         serviceUnderTest.create(request, response);
 
         verify(request).getHeader("username");
-        verify(response).sendError(SC_BAD_REQUEST, "Username can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "username can't be null");
     }
 
     @Test
     public void getByIdSuccess() throws IOException {
         when(userRepository.getById(1L)).thenReturn(getUserWithId());
 
-        User userFromService = serviceUnderTest.getById("1", response);
+        User userFromService = serviceUnderTest.getById("1", response, request);
 
         assertEquals(getUserWithId(), userFromService);
         verify(userRepository, times(1)).getById(1L);
@@ -123,7 +123,7 @@ public class UserServiceTest extends Mockito {
     public void getByIdFailedUserNotFound() throws IOException {
         when(userRepository.getById(100L)).thenReturn(null);
 
-        User userFromService = serviceUnderTest.getById("100", response);
+        User userFromService = serviceUnderTest.getById("100", response, request);
 
         assertNull(userFromService);
         verify(userRepository, times(1)).getById(100L);
@@ -132,7 +132,7 @@ public class UserServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedIncorrectUserId() throws IOException {
-        User userFromService = serviceUnderTest.getById("sdfgnf", response);
+        User userFromService = serviceUnderTest.getById("sdfgnf", response, request);
 
         assertNull(userFromService);
         verify(userRepository, never()).getById(any());

@@ -18,18 +18,15 @@ import static javax.servlet.http.HttpServletResponse.*;
 public class UserService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
-    private final ServiceHelper helper;
 
     public UserService() {
         userRepository = new HibernateUserRepositoryImpl();
         eventRepository = new HibernateEventRepositoryImpl();
-        helper = new ServiceHelper(eventRepository);
     }
 
-    public UserService(UserRepository userRepository, EventRepository eventRepository, ServiceHelper helper) {
+    public UserService(UserRepository userRepository, EventRepository eventRepository) {
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
-        this.helper = helper;
     }
 
     public List<User> getAll() {
@@ -37,40 +34,28 @@ public class UserService {
     }
 
     public User create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String username = req.getHeader("username");
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
 
-        if (username == null || username.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, "Username can't be null");
-            return null;
+        if (helper.userServiceCreateRequestIsCorrect()) {
+            return helper.createUser();
         } else {
-            User user = new User();
-            user.setName(username);
-            user = userRepository.create(user);
-
-            helper.makeCreateUserEvent(user);
-
-            resp.setStatus(SC_CREATED);
-            return user;
+            return null;
         }
     }
 
-    public User getById(String id, HttpServletResponse resp) throws IOException {
-        User user = null;
-        try {
-            Long idFromRequest = Long.valueOf(id);
-            user = userRepository.getById(idFromRequest);
+    public User getById(String id, HttpServletResponse resp, HttpServletRequest req) throws IOException {
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
 
-            if (user == null) {
-                resp.sendError(SC_NOT_FOUND, "There is no user with such id");
-            }
-        } catch (NumberFormatException e) {
-            resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
+        if (helper.userServiceGetByIdRequestIsCorrect(id)) {
+            return helper.getUserById();
+        } else {
+            return null;
         }
-
-        return user;
     }
 
     public User update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+
         User user = null;
 
         String url = req.getRequestURL().toString();
@@ -108,6 +93,8 @@ public class UserService {
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+
         String url = req.getRequestURL().toString();
         String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 

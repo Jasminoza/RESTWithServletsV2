@@ -30,7 +30,7 @@ public class UserRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(userService.getAll());
         } else {
-            helper.sendJsonFrom(userService.getById(id, resp));
+            helper.sendJsonFrom(userService.getById(id, resp, req));
         }
     }
 

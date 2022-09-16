@@ -3,7 +3,6 @@ package org.yolkin.service;
 import org.yolkin.model.Event;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
-import org.yolkin.util.ServiceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,16 +14,13 @@ import static javax.servlet.http.HttpServletResponse.*;
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final ServiceHelper helper;
 
     public EventService() {
         eventRepository = new HibernateEventRepositoryImpl();
-        helper = new ServiceHelper(eventRepository);
     }
 
-    public EventService(EventRepository eventRepository, ServiceHelper helper) {
+    public EventService(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
-        this.helper = helper;
     }
 
     public List<Event> getAll() {
@@ -49,6 +45,7 @@ public class EventService {
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+
         String url = req.getRequestURL().toString();
         String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 

@@ -6,15 +6,32 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.yolkin.model.Event;
 import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
+import org.yolkin.repository.FileRepository;
+import org.yolkin.repository.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
-public class ServiceHelper {
-    private final EventRepository eventRepository;
+import static javax.servlet.http.HttpServletResponse.*;
 
-    public ServiceHelper(EventRepository eventRepository) {
+public class ServiceHelper {
+    private EventRepository eventRepository;
+    private UserRepository userRepository;
+    private FileRepository fileRepository;
+    private HttpServletResponse resp;
+    private HttpServletRequest req;
+    private Long userIdFromRequest;
+    private User userFromRepo;
+
+    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req) {
         this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.fileRepository = null;
+        this.resp = resp;
+        this.req = req;
     }
 
     public ServletFileUpload setupUploader(String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
@@ -60,4 +77,58 @@ public class ServiceHelper {
         event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} was deleted.");
         eventRepository.create(event);
     }
+
+    public User createUser() {
+        User user = new User();
+        user.setName(req.getHeader("username"));
+        user = userRepository.create(user);
+        makeCreateUserEvent(user);
+        resp.setStatus(SC_CREATED);
+        return user;
+    }
+
+    public boolean userServiceCreateRequestIsCorrect() throws IOException {
+        String headerName = "username";
+        return headerNotBlank(headerName);
+    }
+
+    private boolean headerNotBlank(String headerName) throws IOException {
+        String headerValue = req.getHeader(headerName);
+
+        if (headerValue == null || headerValue.isBlank()) {
+            resp.sendError(SC_BAD_REQUEST, headerName + " can't be null");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean userServiceGetByIdRequestIsCorrect(String id) throws IOException {
+        return userIdIsCorrect(id) && userWasFound();
+    }
+
+    public boolean userIdIsCorrect(String id) throws IOException {
+        try {
+            userIdFromRequest = Long.valueOf(id);
+            return true;
+        } catch (NumberFormatException e) {
+            resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
+            return false;
+        }
+    }
+
+    public User getUserById() {
+        return userFromRepo;
+    }
+
+    private boolean userWasFound() throws IOException {
+        userFromRepo = userRepository.getById(userIdFromRequest);
+
+        if (userFromRepo == null) {
+            resp.sendError(SC_NOT_FOUND, "There is no user with such id");
+            return false;
+        }
+        return true;
+    }
+
+
 }
