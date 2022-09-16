@@ -48,68 +48,13 @@ public class FileService {
     }
 
     public File create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 
-        File file = null;
-
-        String idFromRequest = req.getHeader("user_id");
-
-        if (idFromRequest == null || idFromRequest.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, "User id can't be null");
+        if (helper.fileServiceCreateRequestIsCorrect()) {
+            return helper.createFile();
+        } else {
             return null;
         }
-
-        Long userIdFromRequest;
-
-        try {
-            userIdFromRequest = Long.valueOf(idFromRequest);
-        } catch (NumberFormatException e) {
-            resp.sendError(SC_BAD_REQUEST, "Incorrect user id.");
-            return null;
-        }
-
-        User user = userRepository.getById(userIdFromRequest);
-
-        if (user == null) {
-            resp.sendError(SC_NOT_FOUND, "There is no user with such id.");
-            return null;
-        }
-
-        ServletFileUpload uploader = helper.setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
-        try {
-            Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
-            while (iterator.hasNext()) {
-                FileItem fileItem = iterator.next();
-                Date date = new Date();
-
-                if (!fileItem.isFormField()) {
-                    java.io.File realFile = helper.getFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
-                    try {
-                        File fileForDB = new File();
-                        fileForDB.setName(realFile.getName());
-                        fileForDB.setDateOfUploading(date);
-                        fileForDB.setFilepath(realFile.getPath());
-
-                        Event event = new Event();
-//                        event.setUser(user);
-//                        event.setFile(fileForDB);
-                        eventRepository.create(event);
-
-                        file = fileRepository.create(fileForDB);
-                        fileItem.write(realFile);
-
-                        resp.setStatus(SC_CREATED);
-
-                    } catch (Exception e) {
-                        resp.sendError(SC_NOT_IMPLEMENTED, "Can't save file on hard drive");
-                        return null;
-                    }
-                }
-            }
-        } catch (FileUploadException e) {
-            resp.sendError(SC_NOT_ACCEPTABLE, "Can't upload file or size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
-        }
-        return file;
     }
 
     public File getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {

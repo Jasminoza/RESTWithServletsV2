@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public User create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp);
 
         if (helper.userServiceCreateRequestIsCorrect()) {
             return helper.createUser();

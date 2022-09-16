@@ -1,6 +1,7 @@
 package org.yolkin.util;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.yolkin.model.Event;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
@@ -24,11 +26,16 @@ public class ServiceHelper {
     private HttpServletRequest req;
     private HttpServletResponse resp;
     private Long idFromRequest;
+    private Long userIdFromHeader;
     private User userFromRepo;
     private Event eventFromRepo;
     private File fileFromRepo;
     private String mappingUrl;
     private String idFromUrl;
+    private String usernameFromHeader;
+    private String PATH_FOR_UPLOADING;
+    private int MAX_MEMORY_SIZE;
+    private int MAX_FILE_SIZE;
 
     public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req, String mappingUrl) {
         this.eventRepository = eventRepository;
@@ -38,11 +45,21 @@ public class ServiceHelper {
         this.mappingUrl = mappingUrl;
     }
 
-    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req) {
+    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.resp = resp;
         this.req = req;
+    }
+
+    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.resp = resp;
+        this.req = req;
+        this.PATH_FOR_UPLOADING = PATH_FOR_UPLOADING;
+        this.MAX_FILE_SIZE = MAX_FILE_SIZE;
+        this.MAX_MEMORY_SIZE = MAX_MEMORY_SIZE;
     }
 
     public ServiceHelper(EventRepository eventRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
@@ -86,24 +103,6 @@ public class ServiceHelper {
         return realFile;
     }
 
-    public void makeCreateUserEvent(User user){
-        Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} was created.");
-        eventRepository.create(event);
-    }
-
-    public void makeUpdateUserEvent(User user) {
-        Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} was updated.");
-        eventRepository.create(event);
-    }
-
-    public void makeDeleteUserEvent(User user) {
-        Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} was deleted.");
-        eventRepository.create(event);
-    }
-
     public User createUser() {
         User user = new User();
         user.setName(req.getHeader("username"));
@@ -125,6 +124,15 @@ public class ServiceHelper {
             resp.sendError(SC_BAD_REQUEST, headerName + " can't be null");
             return false;
         }
+
+        if (headerName.equals("username")) {
+            usernameFromHeader = headerValue;
+        }
+
+        if (headerName.equals("user_id")) {
+            userIdFromHeader = Long.valueOf(headerValue);
+        }
+
         return true;
     }
 
@@ -156,6 +164,17 @@ public class ServiceHelper {
         return true;
     }
 
+    private boolean userFromHeaderWasFound() throws IOException {
+        userFromRepo = userRepository.getById(userIdFromHeader);
+
+        if (userFromRepo == null) {
+            resp.sendError(SC_NOT_FOUND, "There is no user with such id");
+            return false;
+        }
+        return true;
+    }
+
+
     public boolean userServiceDeleteRequestIsCorrect() throws IOException {
         return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
     }
@@ -186,7 +205,7 @@ public class ServiceHelper {
 
     public User updateUser() {
         userFromRepo = getUserById();
-        userFromRepo.setName(req.getHeader("username"));
+        userFromRepo.setName(usernameFromHeader);
         User updatedUser = userRepository.update(userFromRepo);
         makeUpdateUserEvent(updatedUser);
         resp.setStatus(SC_OK);
@@ -243,5 +262,74 @@ public class ServiceHelper {
     public void deleteFile() {
         resp.setStatus(SC_NO_CONTENT);
         fileRepository.delete(idFromRequest);
+    }
+
+    public boolean fileServiceCreateRequestIsCorrect() throws IOException {
+        return headerNotBlank("user_id") && requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userFromHeaderWasFound() &&
+    }
+
+    public File createFile() throws IOException {
+        ServletFileUpload uploader = setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
+        File file = null;
+
+        try {
+            Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
+            while (iterator.hasNext()) {
+                FileItem fileItem = iterator.next();
+                Date date = new Date();
+                if (!fileItem.isFormField()) {
+                    java.io.File realFile = getFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
+                    file = saveFile(realFile, fileItem, date);
+                }
+            }
+        } catch (FileUploadException e) {
+            resp.sendError(SC_NOT_ACCEPTABLE, "Can't upload file or size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
+            return null;
+        }
+        return file;
+    }
+
+    private File saveFile(java.io.File realFile, FileItem fileItem, Date date) throws IOException {
+        File file;
+        try {
+            File fileForDB = new File();
+            fileForDB.setName(realFile.getName());
+            fileForDB.setDateOfUploading(date);
+            fileForDB.setFilepath(realFile.getPath());
+
+            file = fileRepository.create(fileForDB);
+            fileItem.write(realFile);
+            makeCreateFileEvent(file);
+
+            resp.setStatus(SC_CREATED);
+        } catch (Exception e) {
+            resp.sendError(SC_NOT_IMPLEMENTED, "Can't save file on hard drive");
+            return null;
+        }
+        return file;
+    }
+
+    private void makeCreateFileEvent(File file) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been created.");
+        eventRepository.create(event);
+    }
+
+    public void makeCreateUserEvent(User user) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been created.");
+        eventRepository.create(event);
+    }
+
+    public void makeUpdateUserEvent(User user) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been updated.");
+        eventRepository.create(event);
+    }
+
+    public void makeDeleteUserEvent(User user) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been deleted.");
+        eventRepository.create(event);
     }
 }
