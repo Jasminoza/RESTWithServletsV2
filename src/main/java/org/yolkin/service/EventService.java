@@ -26,11 +26,11 @@ public class EventService {
         return eventRepository.getAll();
     }
 
-    public Event getById(String id, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+    public Event getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
         ServiceHelper helper = new ServiceHelper(eventRepository, req, resp, mappingUrl);
 
         if (helper.eventServiceGetByIdRequestIsCorrect()) {
-            return helper.getEventById(id);
+            return helper.getEventById();
         } else {
             return null;
         }

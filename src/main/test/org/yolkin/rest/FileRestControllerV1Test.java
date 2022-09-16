@@ -52,7 +52,7 @@ public class FileRestControllerV1Test extends Mockito {
         controllerUnderTest.doGet(request, response);
 
         verify(fileService, times(1)).getAll();
-        verify(fileService, never()).getById(any(), any());
+        verify(fileService, never()).getById(any(), any(), anyString());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class FileRestControllerV1Test extends Mockito {
         controllerUnderTest.doGet(request, response);
 
         verify(response).setContentType("application/json;charset=UTF-8");
-        verify(fileService, times(1)).getById("1", response);
+        verify(fileService, times(1)).getById(request, response, mappingUrl);
     }
 
     @Test

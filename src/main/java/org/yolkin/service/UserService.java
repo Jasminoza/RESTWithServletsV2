@@ -40,10 +40,10 @@ public class UserService {
         }
     }
 
-    public User getById(String id, HttpServletResponse resp, HttpServletRequest req) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+    public User getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
 
-        if (helper.userServiceGetByIdRequestIsCorrect(id)) {
+        if (helper.userServiceGetByIdRequestIsCorrect()) {
             return helper.getUserById();
         } else {
             return null;

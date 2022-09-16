@@ -45,7 +45,7 @@ public class EventRestControllerV1Test extends Mockito {
 
         verify(response).setContentType("application/json;charset=UTF-8");
         verify(eventService, times(1)).getAll();
-        verify(eventService, never()).getById(anyString(), any(), any(), anyString());
+        verify(eventService, never()).getById(any(), any(), anyString());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class EventRestControllerV1Test extends Mockito {
 
         verify(response).setContentType("application/json;charset=UTF-8");
         verify(eventService, never()).getAll();
-        verify(eventService, times(1)).getById("1", request, response, mappingUrl);
+        verify(eventService, times(1)).getById(request, response, mappingUrl);
     }
 
     @Test

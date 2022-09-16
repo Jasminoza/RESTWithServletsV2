@@ -112,28 +112,14 @@ public class FileService {
         return file;
     }
 
-    public File getById(String id, HttpServletResponse resp) throws IOException {
+    public File getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
         ServiceHelper helper = new ServiceHelper(eventRepository, req, resp, mappingUrl);
 
-        if (helper.fileServiceGetByIdRequestIsCotrrect()) {
+        if (helper.fileServiceGetByIdRequestIsCorrect()) {
             return helper.getFileById();
         } else {
             return null;
         }
-
-        File file = null;
-
-        try {
-            Long idFromRequest = Long.valueOf(id);
-            file = fileRepository.getById(idFromRequest);
-
-            if (file == null) {
-                resp.sendError(SC_NOT_FOUND, "There is no file with such id");
-            }
-        } catch (NumberFormatException e) {
-            resp.sendError(SC_BAD_REQUEST, "Incorrect file id");
-        }
-        return file;
     }
 
     public File update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {

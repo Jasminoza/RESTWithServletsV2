@@ -4,6 +4,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.yolkin.model.Event;
+import org.yolkin.model.File;
 import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
@@ -11,7 +12,6 @@ import org.yolkin.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -26,6 +26,7 @@ public class ServiceHelper {
     private Long idFromRequest;
     private User userFromRepo;
     private Event eventFromRepo;
+    private File fileFromRepo;
     private String mappingUrl;
     private String idFromUrl;
 
@@ -67,10 +68,10 @@ public class ServiceHelper {
 
         String fileName = fileItem.getName();
         if (fileName.lastIndexOf("\\") >= 0) {
-            realFile = new java.io.File(PATH_FOR_UPLOADING + File.separator + date + " " +
+            realFile = new java.io.File(PATH_FOR_UPLOADING + java.io.File.separator + date + " " +
                     fileName.substring(fileName.lastIndexOf("\\")));
         } else {
-            realFile = new java.io.File(PATH_FOR_UPLOADING + File.separator + date + " " +
+            realFile = new java.io.File(PATH_FOR_UPLOADING + java.io.File.separator + date + " " +
                     fileName.substring(fileName.lastIndexOf("\\") + 1));
         }
 
@@ -119,13 +120,13 @@ public class ServiceHelper {
         return true;
     }
 
-    public boolean userServiceGetByIdRequestIsCorrect(String id) throws IOException {
-        return idFromUrlIsCorrect(id) && userWasFound();
+    public boolean userServiceGetByIdRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
     }
 
-    private boolean idFromUrlIsCorrect(String id) throws IOException {
+    private boolean idFromUrlIsCorrect(String idFromUrl) throws IOException {
         try {
-            idFromRequest = Long.valueOf(id);
+            idFromRequest = Long.valueOf(idFromUrl);
             return true;
         } catch (NumberFormatException e) {
             resp.sendError(SC_BAD_REQUEST, "Incorrect id");
@@ -197,7 +198,7 @@ public class ServiceHelper {
         return true;
     }
 
-    public Event getEventById(String id) {
+    public Event getEventById() {
         return eventFromRepo;
     }
 
@@ -210,7 +211,21 @@ public class ServiceHelper {
         eventRepository.delete(idFromRequest);
     }
 
-    public boolean fileServiceGetByIdRequestIsCotrrect() {
+    public boolean fileServiceGetByIdRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
+    }
 
+    private boolean fileWasFound() throws IOException {
+        fileFromRepo = fileRepository.getById(idFromRequest);
+        if (fileFromRepo == null) {
+            resp.sendError(SC_NOT_FOUND, "There is no file with such id");
+            return false;
+        }
+        return true;
+    }
+
+
+    public File getFileById() {
+        return fileFromRepo;
     }
 }

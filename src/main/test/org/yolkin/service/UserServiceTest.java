@@ -111,9 +111,10 @@ public class UserServiceTest extends Mockito {
 
     @Test
     public void getByIdSuccess() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
         when(userRepository.getById(1L)).thenReturn(getUserWithId());
 
-        User userFromService = serviceUnderTest.getById("1", response, request);
+        User userFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertEquals(getUserWithId(), userFromService);
         verify(userRepository, times(1)).getById(1L);
@@ -121,9 +122,10 @@ public class UserServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedUserNotFound() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
         when(userRepository.getById(100L)).thenReturn(null);
 
-        User userFromService = serviceUnderTest.getById("100", response, request);
+        User userFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertNull(userFromService);
         verify(userRepository, times(1)).getById(100L);
@@ -132,7 +134,9 @@ public class UserServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedIncorrectUserId() throws IOException {
-        User userFromService = serviceUnderTest.getById("sdfgnf", response, request);
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/sdfgnf"));
+
+        User userFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertNull(userFromService);
         verify(userRepository, never()).getById(any());

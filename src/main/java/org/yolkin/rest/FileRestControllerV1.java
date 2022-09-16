@@ -30,7 +30,7 @@ public class FileRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(fileService.getAll());
         } else {
-            helper.sendJsonFrom(fileService.getById(id, req, resp));
+            helper.sendJsonFrom(fileService.getById(req, resp, mappingUrl));
         }
     }
 

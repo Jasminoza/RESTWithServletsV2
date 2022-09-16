@@ -137,7 +137,7 @@ public class FileServiceTest extends Mockito {
         when(fileRepository.getById(1L)).thenReturn(getFiles().get(0));
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
 
-        File fileFromService = serviceUnderTest.getById("1", response);
+        File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertEquals(getFiles().get(0), fileFromService);
         verify(fileRepository, times(1)).getById(1L);
@@ -148,8 +148,9 @@ public class FileServiceTest extends Mockito {
     @Test
     public void getByIdFailedEventNotFound() throws IOException {
         when(fileRepository.getById(100L)).thenReturn(null);
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/100"));
 
-        File fileFromService = serviceUnderTest.getById("100", response);
+        File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertNull(fileFromService);
         verify(fileRepository, times(1)).getById(100L);
@@ -159,11 +160,13 @@ public class FileServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedIncorrectEventId() throws IOException {
-        File fileFromService = serviceUnderTest.getById("edfgsdf", response);
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/edfgsdf"));
+
+        File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertNull(fileFromService);
         verify(fileRepository, never()).getById(any());
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect file id");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(response, never()).sendError(SC_NOT_FOUND, "There is no file with such id");
     }
 
