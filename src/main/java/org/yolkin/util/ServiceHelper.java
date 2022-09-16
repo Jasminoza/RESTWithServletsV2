@@ -165,4 +165,17 @@ public class ServiceHelper {
         }
         return true;
     }
+
+    public boolean userServiceUpdateRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("username") && userWasFound();
+    }
+
+    public User updateUser() {
+        userFromRepo = getUserById();
+        userFromRepo.setName(req.getHeader("username"));
+        User updatedUser = userRepository.update(userFromRepo);
+        makeUpdateUserEvent(updatedUser);
+        resp.setStatus(SC_OK);
+        return updatedUser;
+    }
 }

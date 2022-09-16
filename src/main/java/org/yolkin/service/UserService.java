@@ -56,41 +56,11 @@ public class UserService {
     public User update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
         ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
 
-
-        User user = null;
-
-        String url = req.getRequestURL().toString();
-        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
-
-        if (id.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, "User id can't be null");
-            return null;
+        if(helper.userServiceUpdateRequestIsCorrect()) {
+            return helper.updateUser();
         } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-
-                String username = req.getHeader("username");
-
-                if (username == null || username.isBlank()) {
-                    resp.sendError(SC_BAD_REQUEST, "Username can't be null");
-                    return null;
-                }
-                user = userRepository.getById(idFromRequest);
-
-                if (user == null) {
-                    resp.sendError(SC_NOT_FOUND, "There is no user with such id");
-                    return null;
-                } else {
-                    user.setName(username);
-                    user = userRepository.update(user);
-
-                    helper.makeUpdateUserEvent(user);
-                }
-            } catch (NumberFormatException e) {
-                resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
-            }
+            return null;
         }
-        return user;
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
