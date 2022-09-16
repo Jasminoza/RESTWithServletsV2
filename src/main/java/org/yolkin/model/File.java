@@ -3,7 +3,6 @@ package org.yolkin.model;
 import jakarta.persistence.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,9 +20,6 @@ public class File {
 
     @Column(name = "date_of_uploading")
     private Date dateOfUploading;
-
-//    @ManyToMany(mappedBy = "file")
-//    private List<Event> events;
 
     public File() {
     }
@@ -59,14 +55,6 @@ public class File {
     public void setDateOfUploading(Date dateOfUploading) {
         this.dateOfUploading = dateOfUploading;
     }
-
-//    public List<Event> getEvents() {
-//        return events;
-//    }
-//
-//    public void setEvents(List<Event> events) {
-//        this.events = events;
-//    }
 
     @Override
     public boolean equals(Object o) {

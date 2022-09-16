@@ -1,10 +1,7 @@
 package org.yolkin.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -16,9 +13,6 @@ public class User {
 
     @Column(name = "name", nullable = false)
     private String name;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Event> events;
 
     public User() {
     }
@@ -37,14 +31,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
     }
 
     @Override
