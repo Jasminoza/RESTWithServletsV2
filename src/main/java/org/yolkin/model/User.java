@@ -22,7 +22,7 @@ public class User {
             joinColumns = {@JoinColumn(name = "event_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )
-    private List<Event> events = new ArrayList<>();
+    private List<Event> events;
 
     public User() {
     }
