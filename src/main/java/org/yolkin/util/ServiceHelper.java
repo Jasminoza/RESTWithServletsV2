@@ -21,8 +21,8 @@ public class ServiceHelper {
     private EventRepository eventRepository;
     private UserRepository userRepository;
     private FileRepository fileRepository;
-    private HttpServletResponse resp;
     private HttpServletRequest req;
+    private HttpServletResponse resp;
     private Long idFromRequest;
     private User userFromRepo;
     private Event eventFromRepo;
@@ -47,6 +47,14 @@ public class ServiceHelper {
 
     public ServiceHelper(EventRepository eventRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
         this.eventRepository = eventRepository;
+        this.resp = resp;
+        this.req = req;
+        this.mappingUrl = mappingUrl;
+    }
+
+    public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
+        this.eventRepository = eventRepository;
+        this.fileRepository = fileRepository;
         this.resp = resp;
         this.req = req;
         this.mappingUrl = mappingUrl;
