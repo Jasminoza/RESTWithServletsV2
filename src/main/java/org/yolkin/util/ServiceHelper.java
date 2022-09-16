@@ -184,7 +184,7 @@ public class ServiceHelper {
         return updatedUser;
     }
 
-    public boolean evenServiceGetByIdRequestIsCorrect() throws IOException {
+    public boolean eventServiceGetByIdRequestIsCorrect() throws IOException {
         return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
     }
 
@@ -199,5 +199,14 @@ public class ServiceHelper {
 
     public Event getEventById(String id) {
         return eventFromRepo;
+    }
+
+    public boolean eventServiceDeleteRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
+    }
+
+    public void deleteEvent() {
+        resp.setStatus(SC_NO_CONTENT);
+        eventRepository.delete(idFromRequest);
     }
 }

@@ -113,7 +113,7 @@ public class EventServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "Event id can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(eventRepository, never()).getById(any());
         verify(eventRepository, never()).delete(any());
     }
@@ -133,7 +133,7 @@ public class EventServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/rgswerg"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "Incorrect event id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(eventRepository, never()).getById(any());
         verify(eventRepository, never()).update(any());
     }
