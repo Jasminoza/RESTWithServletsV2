@@ -60,11 +60,11 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void getByIdSusses() throws IOException {
+    public void getByIdSuccess() throws IOException {
         when(eventRepository.getById(1L)).thenReturn(getEvents().get(0));
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/1"));
 
-        Event eventFromService = serviceUnderTest.getById("1", response);
+        Event eventFromService = serviceUnderTest.getById("1", request, response, mappingUrl);
 
         assertEquals(getEvents().get(0), eventFromService);
         verify(eventRepository, times(1)).getById(1L);
@@ -74,9 +74,10 @@ public class EventServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedEventNotFound() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/100"));
         when(eventRepository.getById(100L)).thenReturn(null);
 
-        Event eventFromService = serviceUnderTest.getById("100", response);
+        Event eventFromService = serviceUnderTest.getById("100", request, response, mappingUrl);
 
         assertNull(eventFromService);
         verify(eventRepository, times(1)).getById(100L);
@@ -86,11 +87,13 @@ public class EventServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedIncorrectEventId() throws IOException {
-        Event eventFromService = serviceUnderTest.getById("edfgsdf", response);
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/edfgsdf"));
+
+        Event eventFromService = serviceUnderTest.getById("edfgsdf", request, response, mappingUrl);
 
         assertNull(eventFromService);
         verify(eventRepository,never()).getById(any());
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect event id");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(response, never()).sendError(SC_NOT_FOUND, "There is no event with such id");
     }
 
@@ -102,7 +105,7 @@ public class EventServiceTest extends Mockito {
 
         verify(eventRepository, times(1)).getById(1L);
         verify(eventRepository, times(1)).delete(any());
-        verify(response, times(1)).setStatus(SC_OK);
+        verify(response, times(1)).setStatus(SC_NO_CONTENT);
     }
 
     @Test

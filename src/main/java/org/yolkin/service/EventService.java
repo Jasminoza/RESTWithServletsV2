@@ -3,6 +3,7 @@ package org.yolkin.service;
 import org.yolkin.model.Event;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
+import org.yolkin.util.ServiceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,21 +28,14 @@ public class EventService {
         return eventRepository.getAll();
     }
 
-    public Event getById(String id, HttpServletResponse resp) throws IOException {
-        Event event = null;
+    public Event getById(String id, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+        ServiceHelper helper = new ServiceHelper(eventRepository, req, resp, mappingUrl);
 
-        try {
-            Long idFromRequest = Long.valueOf(id);
-            event = eventRepository.getById(idFromRequest);
-
-            if (event == null) {
-                resp.sendError(SC_NOT_FOUND, "There is no event with such id");
-            }
-        } catch (NumberFormatException e) {
-            resp.sendError(SC_BAD_REQUEST, "Incorrect event id");
+        if (helper.evenServiceGetByIdRequestIsCorrect()) {
+            return helper.getEventById(id);
+        } else {
+            return null;
         }
-
-        return event;
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {

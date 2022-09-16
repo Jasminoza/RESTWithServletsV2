@@ -23,15 +23,15 @@ public class ServiceHelper {
     private FileRepository fileRepository;
     private HttpServletResponse resp;
     private HttpServletRequest req;
-    private Long userIdFromRequest;
+    private Long idFromRequest;
     private User userFromRepo;
+    private Event eventFromRepo;
     private String mappingUrl;
     private String idFromUrl;
 
     public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req, String mappingUrl) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.fileRepository = null;
         this.resp = resp;
         this.req = req;
         this.mappingUrl = mappingUrl;
@@ -40,10 +40,15 @@ public class ServiceHelper {
     public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.fileRepository = null;
         this.resp = resp;
         this.req = req;
-        this.mappingUrl = null;
+    }
+
+    public ServiceHelper(EventRepository eventRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
+        this.eventRepository = eventRepository;
+        this.resp = resp;
+        this.req = req;
+        this.mappingUrl = mappingUrl;
     }
 
     public ServletFileUpload setupUploader(String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
@@ -120,7 +125,7 @@ public class ServiceHelper {
 
     private boolean idFromUrlIsCorrect(String id) throws IOException {
         try {
-            userIdFromRequest = Long.valueOf(id);
+            idFromRequest = Long.valueOf(id);
             return true;
         } catch (NumberFormatException e) {
             resp.sendError(SC_BAD_REQUEST, "Incorrect id");
@@ -133,7 +138,7 @@ public class ServiceHelper {
     }
 
     private boolean userWasFound() throws IOException {
-        userFromRepo = userRepository.getById(userIdFromRequest);
+        userFromRepo = userRepository.getById(idFromRequest);
 
         if (userFromRepo == null) {
             resp.sendError(SC_NOT_FOUND, "There is no user with such id");
@@ -152,7 +157,7 @@ public class ServiceHelper {
     }
 
     public void deleteUser() {
-        userRepository.delete(userIdFromRequest);
+        userRepository.delete(idFromRequest);
         resp.setStatus(SC_NO_CONTENT);
         makeDeleteUserEvent(userFromRepo);
     }
@@ -177,5 +182,22 @@ public class ServiceHelper {
         makeUpdateUserEvent(updatedUser);
         resp.setStatus(SC_OK);
         return updatedUser;
+    }
+
+    public boolean evenServiceGetByIdRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
+    }
+
+    private boolean eventWasFound() throws IOException {
+        eventFromRepo = eventRepository.getById(idFromRequest);
+        if (eventFromRepo == null) {
+            resp.sendError(SC_NOT_FOUND, "There is no event with such id");
+            return false;
+        }
+        return true;
+    }
+
+    public Event getEventById(String id) {
+        return eventFromRepo;
     }
 }

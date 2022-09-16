@@ -90,13 +90,14 @@ public class FileService {
                         fileForDB.setDateOfUploading(date);
                         fileForDB.setFilepath(realFile.getPath());
 
-                        file = fileRepository.create(fileForDB);
-                        fileItem.write(realFile);
-
                         Event event = new Event();
 //                        event.setUser(user);
 //                        event.setFile(fileForDB);
                         eventRepository.create(event);
+
+                        file = fileRepository.create(fileForDB);
+                        fileItem.write(realFile);
+
                         resp.setStatus(SC_CREATED);
 
                     } catch (Exception e) {

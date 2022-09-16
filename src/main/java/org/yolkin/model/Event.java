@@ -1,6 +1,8 @@
 package org.yolkin.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,8 @@ public class Event {
     private String event;
 
     @ManyToMany(mappedBy = "events")
-    private List<User> users = new ArrayList<>();
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<User> users;
 
     public Event() {
     }
