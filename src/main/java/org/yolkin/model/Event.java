@@ -16,9 +16,6 @@ public class Event {
     @ManyToMany(mappedBy = "events")
     private List<User> users = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "events2")
-    private List<File> files = new ArrayList<>();
-
     public Event() {
     }
 

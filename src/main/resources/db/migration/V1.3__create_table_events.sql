@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS events (
       id     INT AUTO_INCREMENT NOT NULL,
+      event  TEXT NOT NULL,
       PRIMARY KEY (id)
 );
