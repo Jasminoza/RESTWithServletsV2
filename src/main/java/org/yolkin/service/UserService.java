@@ -97,6 +97,8 @@ public class UserService {
                 } else {
                     user.setName(username);
                     user = userRepository.update(user);
+
+                    helper.makeUpdateUserEvent(user);
                 }
             } catch (NumberFormatException e) {
                 resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
@@ -120,6 +122,7 @@ public class UserService {
                     resp.sendError(SC_NOT_FOUND, "There is no user with such id");
                 } else {
                     userRepository.delete(idFromRequest);
+                    helper.makeDeleteUserEvent(user);
                     resp.setStatus(SC_NO_CONTENT);
                 }
             } catch (NumberFormatException e) {

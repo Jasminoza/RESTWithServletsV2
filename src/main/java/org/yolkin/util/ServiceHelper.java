@@ -49,4 +49,15 @@ public class ServiceHelper {
         eventRepository.create(event);
     }
 
+    public void makeUpdateUserEvent(User user) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} was updated.");
+        eventRepository.create(event);
+    }
+
+    public void makeDeleteUserEvent(User user) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} was deleted.");
+        eventRepository.create(event);
+    }
 }
