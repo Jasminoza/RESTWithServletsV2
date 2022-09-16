@@ -60,7 +60,7 @@ public class EventService {
                     resp.sendError(SC_NOT_FOUND, "There is no event with such id");
                 } else {
                     eventRepository.delete(idFromRequest);
-                    resp.setStatus(SC_OK);
+                    resp.setStatus(SC_NO_CONTENT);
                 }
             } catch (NumberFormatException e) {
                 resp.sendError(SC_BAD_REQUEST, "Incorrect event id");

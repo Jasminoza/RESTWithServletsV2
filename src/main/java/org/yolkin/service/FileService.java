@@ -198,7 +198,7 @@ public class FileService {
                     resp.sendError(SC_NOT_FOUND, "There is no file with such id");
                 } else {
                     fileRepository.delete(idFromRequest);
-                    resp.setStatus(SC_OK);
+                    resp.setStatus(SC_NO_CONTENT);
                 }
             } catch (NumberFormatException e) {
                 resp.sendError(SC_BAD_REQUEST, "Incorrect file id");
