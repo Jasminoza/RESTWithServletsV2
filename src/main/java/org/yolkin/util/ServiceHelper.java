@@ -25,6 +25,17 @@ public class ServiceHelper {
     private HttpServletRequest req;
     private Long userIdFromRequest;
     private User userFromRepo;
+    private String mappingUrl;
+    private String idFromUrl;
+
+    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req, String mappingUrl) {
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.fileRepository = null;
+        this.resp = resp;
+        this.req = req;
+        this.mappingUrl = mappingUrl;
+    }
 
     public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req) {
         this.eventRepository = eventRepository;
@@ -32,6 +43,7 @@ public class ServiceHelper {
         this.fileRepository = null;
         this.resp = resp;
         this.req = req;
+        this.mappingUrl = null;
     }
 
     public ServletFileUpload setupUploader(String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
@@ -103,15 +115,15 @@ public class ServiceHelper {
     }
 
     public boolean userServiceGetByIdRequestIsCorrect(String id) throws IOException {
-        return userIdIsCorrect(id) && userWasFound();
+        return idFromUrlIsCorrect(id) && userWasFound();
     }
 
-    public boolean userIdIsCorrect(String id) throws IOException {
+    private boolean idFromUrlIsCorrect(String id) throws IOException {
         try {
             userIdFromRequest = Long.valueOf(id);
             return true;
         } catch (NumberFormatException e) {
-            resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
+            resp.sendError(SC_BAD_REQUEST, "Incorrect id");
             return false;
         }
     }
@@ -130,5 +142,27 @@ public class ServiceHelper {
         return true;
     }
 
+    public boolean userServiceDeleteRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
+    }
 
+    private String getIdFromUrl() {
+        String url = req.getRequestURL().toString();
+        return url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
+    }
+
+    public void deleteUser() {
+        userRepository.delete(userIdFromRequest);
+        resp.setStatus(SC_NO_CONTENT);
+        makeDeleteUserEvent(userFromRepo);
+    }
+
+    private boolean requestUrlContainsId() throws IOException {
+        idFromUrl = getIdFromUrl();
+        if (idFromUrl.isBlank()) {
+            resp.sendError(SC_BAD_REQUEST, "Id can't be null");
+            return false;
+        }
+        return true;
+    }
 }

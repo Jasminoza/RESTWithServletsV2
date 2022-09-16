@@ -54,7 +54,8 @@ public class UserService {
     }
 
     public User update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
+
 
         User user = null;
 
@@ -93,28 +94,10 @@ public class UserService {
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
 
-        String url = req.getRequestURL().toString();
-        String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
-
-        if (id.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, "User id can't be null");
-        } else {
-            try {
-                Long idFromRequest = Long.valueOf(id);
-                User user = userRepository.getById(idFromRequest);
-
-                if (user == null) {
-                    resp.sendError(SC_NOT_FOUND, "There is no user with such id");
-                } else {
-                    userRepository.delete(idFromRequest);
-                    helper.makeDeleteUserEvent(user);
-                    resp.setStatus(SC_NO_CONTENT);
-                }
-            } catch (NumberFormatException e) {
-                resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
-            }
+        if (helper.userServiceDeleteRequestIsCorrect()) {
+           helper.deleteUser();
         }
     }
 }

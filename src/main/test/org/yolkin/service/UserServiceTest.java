@@ -136,7 +136,7 @@ public class UserServiceTest extends Mockito {
 
         assertNull(userFromService);
         verify(userRepository, never()).getById(any());
-        verify(response).sendError(SC_BAD_REQUEST, "Incorrect user id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect id");
     }
 
     @Test
@@ -210,7 +210,7 @@ public class UserServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "User id can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).delete(any());
     }
@@ -230,7 +230,7 @@ public class UserServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "Incorrect user id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
