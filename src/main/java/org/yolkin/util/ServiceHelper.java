@@ -130,7 +130,12 @@ public class ServiceHelper {
         }
 
         if (headerName.equals("user_id")) {
-            userIdFromHeader = Long.valueOf(headerValue);
+           try {
+               userIdFromHeader = Long.valueOf(headerValue);
+           } catch (NumberFormatException e) {
+               resp.sendError(SC_BAD_REQUEST, "Incorrect id");
+               return false;
+           }
         }
 
         return true;

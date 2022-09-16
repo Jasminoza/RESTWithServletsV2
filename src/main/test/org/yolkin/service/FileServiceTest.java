@@ -100,7 +100,7 @@ public class FileServiceTest extends Mockito {
         File file = serviceUnderTest.create(request, response);
 
         assertNull(file);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "User id can't be null");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id can't be null");
         verify(userRepository, never()).getById(any());
         verify(fileRepository, never()).create(any());
         verify(eventRepository, never()).create(any());
@@ -113,7 +113,7 @@ public class FileServiceTest extends Mockito {
         File file = serviceUnderTest.create(request, response);
 
         assertNull(file);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect user id.");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(userRepository, never()).getById(any());
         verify(fileRepository, never()).create(any());
         verify(eventRepository, never()).create(any());
@@ -126,7 +126,7 @@ public class FileServiceTest extends Mockito {
         File file = serviceUnderTest.create(request, response);
 
         assertNull(file);
-        verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no user with such id.");
+        verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(userRepository, times(1)).getById(any());
         verify(fileRepository, never()).create(any());
         verify(eventRepository, never()).create(any());

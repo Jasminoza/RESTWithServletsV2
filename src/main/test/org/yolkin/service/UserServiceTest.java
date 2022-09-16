@@ -28,9 +28,9 @@ public class UserServiceTest extends Mockito {
     @Mock
     private EventRepository eventRepository;
     @Mock
-    private HttpServletRequest request;
+    private HttpServletRequest req;
     @Mock
-    private HttpServletResponse response;
+    private HttpServletResponse resp;
     private ServiceHelper helper;
     private StringWriter writer;
     private PrintWriter printWriter;
@@ -44,10 +44,10 @@ public class UserServiceTest extends Mockito {
 
     @BeforeEach
     public void setWriter() throws IOException {
-        helper = new ServiceHelper(eventRepository, userRepository, response, request);
+        helper = new ServiceHelper(eventRepository, userRepository, req, resp);
         writer = new StringWriter();
         printWriter = new PrintWriter(writer);
-        when(response.getWriter()).thenReturn(printWriter);
+        when(resp.getWriter()).thenReturn(printWriter);
     }
 
     private List<User> getUsers() {
@@ -77,7 +77,7 @@ public class UserServiceTest extends Mockito {
     @Test
     public void getAllSuccess() {
         when(userRepository.getAll()).thenReturn(getUsers());
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/users/"));
 
         List<User> usersFromService = serviceUnderTest.getAll();
 
@@ -89,32 +89,32 @@ public class UserServiceTest extends Mockito {
         User userWithoutId = getUserWithoutId();
         User userWithId = getUserWithId();
 
-        when(request.getHeader("username")).thenReturn("Ivan");
+        when(req.getHeader("username")).thenReturn("Ivan");
         when(userRepository.create(userWithoutId)).thenReturn(userWithId);
 
-        User userFromService = serviceUnderTest.create(request, response);
+        User userFromService = serviceUnderTest.create(req, resp);
 
-        verify(response).setStatus(SC_CREATED);
-        verify(response, never()).sendError(anyInt(), anyString());
+        verify(resp).setStatus(SC_CREATED);
+        verify(resp, never()).sendError(anyInt(), anyString());
         assertEquals(userWithId, userFromService);
     }
 
     @Test
     public void createFailedBlankUsername() throws IOException {
-        when(request.getHeader("username")).thenReturn(" ");
+        when(req.getHeader("username")).thenReturn(" ");
 
-        serviceUnderTest.create(request, response);
+        serviceUnderTest.create(req, resp);
 
-        verify(request).getHeader("username");
-        verify(response).sendError(SC_BAD_REQUEST, "username can't be null");
+        verify(req).getHeader("username");
+        verify(resp).sendError(SC_BAD_REQUEST, "username can't be null");
     }
 
     @Test
     public void getByIdSuccess() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
         when(userRepository.getById(1L)).thenReturn(getUserWithId());
 
-        User userFromService = serviceUnderTest.getById(request, response, mappingUrl);
+        User userFromService = serviceUnderTest.getById(req, resp, mappingUrl);
 
         assertEquals(getUserWithId(), userFromService);
         verify(userRepository, times(1)).getById(1L);
@@ -122,69 +122,69 @@ public class UserServiceTest extends Mockito {
 
     @Test
     public void getByIdFailedUserNotFound() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
         when(userRepository.getById(100L)).thenReturn(null);
 
-        User userFromService = serviceUnderTest.getById(request, response, mappingUrl);
+        User userFromService = serviceUnderTest.getById(req, resp, mappingUrl);
 
         assertNull(userFromService);
         verify(userRepository, times(1)).getById(100L);
-        verify(response).sendError(SC_NOT_FOUND, "There is no user with such id");
+        verify(resp).sendError(SC_NOT_FOUND, "There is no user with such id");
     }
 
     @Test
     public void getByIdFailedIncorrectUserId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/sdfgnf"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/sdfgnf"));
 
-        User userFromService = serviceUnderTest.getById(request, response, mappingUrl);
+        User userFromService = serviceUnderTest.getById(req, resp, mappingUrl);
 
         assertNull(userFromService);
         verify(userRepository, never()).getById(any());
-        verify(response).sendError(SC_BAD_REQUEST, "Incorrect id");
+        verify(resp).sendError(SC_BAD_REQUEST, "Incorrect id");
     }
 
     @Test
     public void updateFailedBlankUserId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
-        User userFromService = serviceUnderTest.update(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
+        User userFromService = serviceUnderTest.update(req, resp, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(SC_BAD_REQUEST, "Id can't be null");
+        verify(resp).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
 
     @Test
     public void updateFailedBlankUsername() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
-        when(request.getHeader("username")).thenReturn(" ");
-        User userFromService = serviceUnderTest.update(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
+        when(req.getHeader("username")).thenReturn(" ");
+        User userFromService = serviceUnderTest.update(req, resp, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(SC_BAD_REQUEST, "username can't be null");
+        verify(resp).sendError(SC_BAD_REQUEST, "username can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
 
     @Test
     public void updateFailedUserNotFound() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
-        when(request.getHeader("username")).thenReturn("Eugene");
-        User userFromService = serviceUnderTest.update(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
+        when(req.getHeader("username")).thenReturn("Eugene");
+        User userFromService = serviceUnderTest.update(req, resp, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(SC_NOT_FOUND, "There is no user with such id");
+        verify(resp).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(userRepository, times(1)).getById(100L);
         verify(userRepository, never()).update(any());
     }
 
     @Test
     public void updateFailedIncorrectUserId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
-        User userFromService = serviceUnderTest.update(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
+        User userFromService = serviceUnderTest.update(req, resp, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(SC_BAD_REQUEST, "Incorrect id");
+        verify(resp).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
@@ -196,57 +196,57 @@ public class UserServiceTest extends Mockito {
         User userAfterUpdate = getUserWithId();
         userAfterUpdate.setName(newUsername);
 
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
-        when(request.getHeader("username")).thenReturn(newUsername);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
+        when(req.getHeader("username")).thenReturn(newUsername);
         when(userRepository.getById(1L)).thenReturn(userBeforeUpdate);
         when(userRepository.update(userAfterUpdate)).thenReturn(userAfterUpdate);
 
-        User userFromService = serviceUnderTest.update(request, response, mappingUrl);
+        User userFromService = serviceUnderTest.update(req, resp, mappingUrl);
 
         assertEquals(userAfterUpdate, userFromService);
-        verify(response, never()).sendError(Mockito.anyInt(), Mockito.anyString());
+        verify(resp, never()).sendError(Mockito.anyInt(), Mockito.anyString());
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).update(userAfterUpdate);
     }
 
     @Test
     public void deleteFailedBlankUserId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
-        serviceUnderTest.delete(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
+        serviceUnderTest.delete(req, resp, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "Id can't be null");
+        verify(resp).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).delete(any());
     }
 
     @Test
     public void deleteFailedUserNotFound() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
-        serviceUnderTest.delete(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
+        serviceUnderTest.delete(req, resp, mappingUrl);
 
-        verify(response).sendError(SC_NOT_FOUND, "There is no user with such id");
+        verify(resp).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(userRepository, times(1)).getById(100L);
         verify(userRepository, never()).delete(any());
     }
 
     @Test
     public void deleteFailedIncorrectUserId() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
-        serviceUnderTest.delete(request, response, mappingUrl);
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
+        serviceUnderTest.delete(req, resp, mappingUrl);
 
-        verify(response).sendError(SC_BAD_REQUEST, "Incorrect id");
+        verify(resp).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
 
     @Test
     public void deleteSuccess() throws IOException {
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
+        when(req.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/1"));
         when(userRepository.getById(1L)).thenReturn(getUserWithId());
-        serviceUnderTest.delete(request, response, mappingUrl);
+        serviceUnderTest.delete(req, resp, mappingUrl);
 
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).delete(1L);
-        verify(response, times(1)).setStatus(SC_NO_CONTENT);
+        verify(resp, times(1)).setStatus(SC_NO_CONTENT);
     }
 }
