@@ -65,6 +65,11 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     private Session getSession(){
-        return HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        try {
+            return HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 }

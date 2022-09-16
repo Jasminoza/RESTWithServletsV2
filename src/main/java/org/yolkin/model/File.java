@@ -22,8 +22,8 @@ public class File {
     @Column(name = "date_of_uploading")
     private Date dateOfUploading;
 
-    @ManyToMany(mappedBy = "files")
-    private List<Event> events;
+//    @ManyToMany(mappedBy = "file")
+//    private List<Event> events;
 
     public File() {
     }
@@ -60,13 +60,13 @@ public class File {
         this.dateOfUploading = dateOfUploading;
     }
 
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
-    }
+//    public List<Event> getEvents() {
+//        return events;
+//    }
+//
+//    public void setEvents(List<Event> events) {
+//        this.events = events;
+//    }
 
     @Override
     public boolean equals(Object o) {

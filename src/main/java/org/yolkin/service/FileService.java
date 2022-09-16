@@ -93,7 +93,7 @@ public class FileService {
                         fileItem.write(realFile);
 
                         Event event = new Event();
-                        event.setUser(user);
+//                        event.setUser(user);
 //                        event.setFile(fileForDB);
                         eventRepository.create(event);
                         resp.setStatus(SC_CREATED);
