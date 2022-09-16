@@ -2,8 +2,6 @@ package org.yolkin.model;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -15,14 +13,6 @@ public class User {
 
     @Column(name = "name", nullable = false)
     private String name;
-
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(
-            name = "users_events",
-            joinColumns = {@JoinColumn(name = "event_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
-    )
-    private List<Event> events;
 
     public User() {
     }
@@ -41,14 +31,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
     }
 
     @Override

@@ -12,7 +12,7 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getAll() {
         try (Session session = getSession()) {
-            return session.createQuery("select u From User u left join fetch u.events", User.class).list();
+            return session.createQuery("From User", User.class).list();
         }
     }
 
@@ -24,8 +24,7 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     @Override
     public User getById(Long id) {
         try (Session session = getSession()) {
-            List<User> user = session.createQuery("select u from User u left join fetch u.events where u.id = " + id, User.class).list();
-            return ((user.size() == 1) ? user.get(0) : null);
+            return session.get(User.class, id);
         }
     }
 
