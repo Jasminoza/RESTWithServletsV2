@@ -265,7 +265,7 @@ public class ServiceHelper {
     }
 
     public boolean fileServiceCreateRequestIsCorrect() throws IOException {
-        return headerNotBlank("user_id") && requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userFromHeaderWasFound() &&
+        return headerNotBlank("user_id") && userFromHeaderWasFound();
     }
 
     public File createFile() throws IOException {
