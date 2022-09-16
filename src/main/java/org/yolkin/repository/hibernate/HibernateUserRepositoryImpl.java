@@ -24,7 +24,8 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     @Override
     public User getById(Long id) {
         try (Session session = getSession()) {
-            return session.get(User.class, id);
+            List<User> user = session.createQuery("select u from User u left join fetch u.events where u.id = " + id, User.class).list();
+            return ((user.size() == 1) ? user.get(0) : null);
         }
     }
 
@@ -64,12 +65,7 @@ public class HibernateUserRepositoryImpl implements UserRepository {
         return ((user.getId() != null) ? user : null);
     }
 
-    private Session getSession(){
-        try {
-            return HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
+    private Session getSession() {
+        return HibernateSessionFactoryUtil.getSessionFactory().openSession();
     }
 }

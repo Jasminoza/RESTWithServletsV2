@@ -142,14 +142,14 @@ public class EventServiceTest extends Mockito {
 
         Event event1 = new Event();
         event1.setId(1L);
-        event1.setUser(users.get(0));
-        event1.setFiles(files.subList(0, 1));
+//        event1.setUser(users.get(0));
+//        event1.setFiles(files.subList(0, 1));
         events.add(event1);
 
         Event event2 = new Event();
         event2.setId(2L);
-        event2.setUser(users.get(1));
-        event2.setFiles(files.subList(2, 3));
+//        event2.setUser(users.get(1));
+//        event2.setFiles(files.subList(2, 3));
         events.add(event2);
 
         return events;

@@ -2,7 +2,9 @@ package org.yolkin.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -20,6 +22,14 @@ public class File {
 
     @Column(name = "date_of_uploading")
     private Date dateOfUploading;
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "events_files",
+            joinColumns = {@JoinColumn(name = "file_id")},
+            inverseJoinColumns = {@JoinColumn(name = "event_id")}
+    )
+    private List<Event> events2 = new ArrayList<>();
 
     public File() {
     }
