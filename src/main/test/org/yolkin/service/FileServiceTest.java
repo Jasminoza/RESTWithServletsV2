@@ -78,6 +78,8 @@ public class FileServiceTest extends Mockito {
 
         File fileFromService = serviceUnderTest.create(request, response);
 
+        //::TODO
+
 //        assertEquals(getFileWithId(), fileFromService);
 //        verify(response, never()).sendError(SC_BAD_REQUEST, "User id can't be null");
 //        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect user id.");
@@ -167,27 +169,27 @@ public class FileServiceTest extends Mockito {
 
     @Test
     public void updateFailedBlankUserId() throws IOException {
-
+        //::TODO
     }
 
     @Test
     public void updateFailedBlankUsername() throws IOException {
-
+        //::TODO
     }
 
     @Test
     public void updateFailedUserNotFound() throws IOException {
-
+        //::TODO
     }
 
     @Test
     public void updateFailedIncorrectUserId() throws IOException {
-
+        //::TODO
     }
 
     @Test
     public void updateSuccess() throws IOException {
-
+        //::TODO
     }
 
     @Test
