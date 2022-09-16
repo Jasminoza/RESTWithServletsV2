@@ -198,7 +198,7 @@ public class FileServiceTest extends Mockito {
 
         verify(fileRepository, times(1)).getById(1L);
         verify(fileRepository, times(1)).delete(any());
-        verify(response, times(1)).setStatus(SC_OK);
+        verify(response, times(1)).setStatus(SC_NO_CONTENT);
     }
 
     @Test
