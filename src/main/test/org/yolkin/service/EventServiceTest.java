@@ -6,8 +6,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.yolkin.model.Event;
-import org.yolkin.model.File;
-import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,11 +14,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class EventServiceTest extends Mockito {
     @Mock
@@ -140,67 +138,15 @@ public class EventServiceTest extends Mockito {
 
     private List<Event> getEvents() {
         List<Event> events = new ArrayList<>();
-        List<User> users = getUsers();
-        List<File> files = getFiles();
 
         Event event1 = new Event();
         event1.setId(1L);
-//        event1.setUser(users.get(0));
-//        event1.setFiles(files.subList(0, 1));
         events.add(event1);
 
         Event event2 = new Event();
         event2.setId(2L);
-//        event2.setUser(users.get(1));
-//        event2.setFiles(files.subList(2, 3));
         events.add(event2);
 
         return events;
     }
-
-    private List<User> getUsers() {
-        User user1 = new User();
-        user1.setId(1L);
-        user1.setName("Petya");
-        User user2 = new User();
-        user2.setId(2L);
-        user2.setName("Vasya");
-
-        return List.of(user1, user2);
-    }
-
-    private List<File> getFiles() {
-        List<File> files = new ArrayList<>();
-
-        File file1 = new File();
-        file1.setId(1L);
-        file1.setName("1.txt");
-        file1.setFilepath("/storage/1.txt");
-        file1.setDateOfUploading(new Date(202201010213011L));
-        files.add(file1);
-
-        File file2 = new File();
-        file1.setId(2L);
-        file1.setName("2.txt");
-        file1.setFilepath("/storage/2.txt");
-        file1.setDateOfUploading(new Date(20220101213012L));
-        files.add(file2);
-
-        File file3 = new File();
-        file1.setId(3L);
-        file1.setName("3.txt");
-        file1.setFilepath("/storage/3.txt");
-        file1.setDateOfUploading(new Date(20220101213013L));
-        files.add(file3);
-
-        File file4 = new File();
-        file1.setId(4L);
-        file1.setName("4.txt");
-        file1.setFilepath("/storage/4.txt");
-        file1.setDateOfUploading(new Date(20220101213014L));
-        files.add(file4);
-
-        return files;
-    }
-
 }
