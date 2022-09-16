@@ -209,4 +209,8 @@ public class ServiceHelper {
         resp.setStatus(SC_NO_CONTENT);
         eventRepository.delete(idFromRequest);
     }
+
+    public boolean fileServiceGetByIdRequestIsCotrrect() {
+
+    }
 }

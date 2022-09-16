@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class FileRestControllerV1 extends HttpServlet {
-
     private final FileService fileService;
     private final String mappingUrl = "/api/v1/files/";
 
@@ -31,7 +30,7 @@ public class FileRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(fileService.getAll());
         } else {
-            helper.sendJsonFrom(fileService.getById(id, resp));
+            helper.sendJsonFrom(fileService.getById(id, req, resp));
         }
     }
 

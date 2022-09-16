@@ -30,7 +30,7 @@ public class EventRestControllerV1 extends HttpServlet {
         if (id.isBlank()) {
             helper.sendJsonFrom(eventService.getAll());
         } else {
-            helper.sendJsonFrom(eventService.getById(id, req, resp, mappingUrl));
+            helper.sendJsonFrom(eventService.getById(id, req, resp));
         }
     }
 

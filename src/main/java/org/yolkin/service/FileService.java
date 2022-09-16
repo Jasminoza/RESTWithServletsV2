@@ -113,6 +113,14 @@ public class FileService {
     }
 
     public File getById(String id, HttpServletResponse resp) throws IOException {
+        ServiceHelper helper = new ServiceHelper(eventRepository, req, resp, mappingUrl);
+
+        if (helper.fileServiceGetByIdRequestIsCotrrect()) {
+            return helper.getFileById();
+        } else {
+            return null;
+        }
+
         File file = null;
 
         try {
