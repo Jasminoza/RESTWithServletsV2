@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static javax.servlet.http.HttpServletResponse.*;
+
 public class EventService {
 
     private final EventRepository eventRepository;
@@ -34,10 +36,10 @@ public class EventService {
             event = eventRepository.getById(idFromRequest);
 
             if (event == null) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+                resp.sendError(SC_NOT_FOUND, "There is no event with such id");
             }
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
+            resp.sendError(SC_BAD_REQUEST, "Incorrect event id");
         }
 
         return event;
@@ -48,20 +50,20 @@ public class EventService {
         String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 
         if (id.isBlank()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Event id can't be null");
+            resp.sendError(SC_BAD_REQUEST, "Event id can't be null");
         } else {
             try {
                 Long idFromRequest = Long.valueOf(id);
                 Event event = eventRepository.getById(idFromRequest);
 
                 if (event == null) {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+                    resp.sendError(SC_NOT_FOUND, "There is no event with such id");
                 } else {
                     eventRepository.delete(idFromRequest);
-                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.setStatus(SC_OK);
                 }
             } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
+                resp.sendError(SC_BAD_REQUEST, "Incorrect event id");
             }
         }
     }

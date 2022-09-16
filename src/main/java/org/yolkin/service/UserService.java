@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static javax.servlet.http.HttpServletResponse.*;
+
+
 public class UserService {
     private final UserRepository userRepository;
 
@@ -28,13 +31,13 @@ public class UserService {
         String username = req.getHeader("username");
 
         if (username == null || username.isBlank()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
+            resp.sendError(SC_BAD_REQUEST, "Username can't be null");
             return null;
         } else {
             User user = new User();
             user.setName(username);
             user = userRepository.create(user);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(SC_CREATED);
             return user;
         }
     }
@@ -46,10 +49,10 @@ public class UserService {
             user = userRepository.getById(idFromRequest);
 
             if (user == null) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+                resp.sendError(SC_NOT_FOUND, "There is no user with such id");
             }
         } catch (NumberFormatException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+            resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
         }
 
         return user;
@@ -62,7 +65,7 @@ public class UserService {
         String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 
         if (id.isBlank()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
+            resp.sendError(SC_BAD_REQUEST, "User id can't be null");
             return null;
         } else {
             try {
@@ -71,20 +74,20 @@ public class UserService {
                 String username = req.getHeader("username");
 
                 if (username == null || username.isBlank()) {
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
+                    resp.sendError(SC_BAD_REQUEST, "Username can't be null");
                     return null;
                 }
                 user = userRepository.getById(idFromRequest);
 
                 if (user == null) {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+                    resp.sendError(SC_NOT_FOUND, "There is no user with such id");
                     return null;
                 } else {
                     user.setName(username);
                     user = userRepository.update(user);
                 }
             } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+                resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
             }
         }
         return user;
@@ -95,20 +98,20 @@ public class UserService {
         String id = url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
 
         if (id.isBlank()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
+            resp.sendError(SC_BAD_REQUEST, "User id can't be null");
         } else {
             try {
                 Long idFromRequest = Long.valueOf(id);
                 User user = userRepository.getById(idFromRequest);
 
                 if (user == null) {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+                    resp.sendError(SC_NOT_FOUND, "There is no user with such id");
                 } else {
                     userRepository.delete(idFromRequest);
-                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.setStatus(SC_OK);
                 }
             } catch (NumberFormatException e) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+                resp.sendError(SC_BAD_REQUEST, "Incorrect user id");
             }
         }
     }

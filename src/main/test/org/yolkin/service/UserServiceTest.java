@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -88,7 +89,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.create(request, response);
 
         verify(request).getHeader("username");
-        verify(response).setStatus(HttpServletResponse.SC_CREATED);
+        verify(response).setStatus(SC_CREATED);
         assertEquals(userWithId, userFromService);
     }
 
@@ -99,7 +100,7 @@ public class UserServiceTest extends Mockito {
         serviceUnderTest.create(request, response);
 
         verify(request).getHeader("username");
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "Username can't be null");
     }
 
     @Test
@@ -120,7 +121,7 @@ public class UserServiceTest extends Mockito {
 
         assertNull(userFromService);
         verify(userRepository, times(1)).getById(100L);
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+        verify(response).sendError(SC_NOT_FOUND, "There is no user with such id");
     }
 
     @Test
@@ -129,7 +130,7 @@ public class UserServiceTest extends Mockito {
 
         assertNull(userFromService);
         verify(userRepository, never()).getById(any());
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect user id");
     }
 
     @Test
@@ -138,7 +139,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "User id can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
@@ -150,7 +151,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Username can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "Username can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
@@ -162,7 +163,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+        verify(response).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(userRepository, times(1)).getById(100L);
         verify(userRepository, never()).update(any());
     }
@@ -173,7 +174,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(userFromService);
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect user id");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
@@ -203,7 +204,7 @@ public class UserServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "User id can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "User id can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).delete(any());
     }
@@ -213,7 +214,7 @@ public class UserServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/100"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no user with such id");
+        verify(response).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(userRepository, times(1)).getById(100L);
         verify(userRepository, never()).delete(any());
     }
@@ -223,7 +224,7 @@ public class UserServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/users/wfgkjd"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect user id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect user id");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
     }
@@ -236,6 +237,6 @@ public class UserServiceTest extends Mockito {
 
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).delete(1L);
-        verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
+        verify(response, times(1)).setStatus(SC_OK);
     }
 }

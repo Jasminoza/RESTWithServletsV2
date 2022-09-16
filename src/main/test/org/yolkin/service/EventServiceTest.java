@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EventServiceTest extends Mockito {
@@ -54,8 +55,8 @@ public class EventServiceTest extends Mockito {
 
         assertEquals(getEvents(), eventsFromService);
         verify(eventRepository, times(1)).getAll();
-        verify(response, never()).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
-        verify(response, never()).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect event id");
+        verify(response, never()).sendError(SC_NOT_FOUND, "There is no event with such id");
     }
 
     @Test
@@ -67,30 +68,30 @@ public class EventServiceTest extends Mockito {
 
         assertEquals(getEvents().get(0), eventFromService);
         verify(eventRepository, times(1)).getById(1L);
-        verify(response, never()).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
-        verify(response, never()).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect event id");
+        verify(response, never()).sendError(SC_NOT_FOUND, "There is no event with such id");
     }
 
     @Test
-    public void detByIdFailedEventNotFound() throws IOException {
+    public void getByIdFailedEventNotFound() throws IOException {
         when(eventRepository.getById(100L)).thenReturn(null);
 
         Event eventFromService = serviceUnderTest.getById("100", response);
 
         assertNull(eventFromService);
         verify(eventRepository, times(1)).getById(100L);
-        verify(response, times(1)).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
-        verify(response, never()).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
+        verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no event with such id");
+        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect event id");
     }
 
     @Test
-    public void detByIdFailedIncorrectEventId() throws IOException {
+    public void getByIdFailedIncorrectEventId() throws IOException {
         Event eventFromService = serviceUnderTest.getById("edfgsdf", response);
 
         assertNull(eventFromService);
         verify(eventRepository,never()).getById(any());
-        verify(response, times(1)).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
-        verify(response, never()).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect event id");
+        verify(response, never()).sendError(SC_NOT_FOUND, "There is no event with such id");
     }
 
     @Test
@@ -101,7 +102,7 @@ public class EventServiceTest extends Mockito {
 
         verify(eventRepository, times(1)).getById(1L);
         verify(eventRepository, times(1)).delete(any());
-        verify(response, times(1)).setStatus(HttpServletResponse.SC_OK);
+        verify(response, times(1)).setStatus(SC_OK);
     }
 
     @Test
@@ -109,7 +110,7 @@ public class EventServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Event id can't be null");
+        verify(response).sendError(SC_BAD_REQUEST, "Event id can't be null");
         verify(eventRepository, never()).getById(any());
         verify(eventRepository, never()).delete(any());
     }
@@ -119,7 +120,7 @@ public class EventServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/100"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND, "There is no event with such id");
+        verify(response).sendError(SC_NOT_FOUND, "There is no event with such id");
         verify(eventRepository, times(1)).getById(100L);
         verify(eventRepository, never()).delete(any());
     }
@@ -129,7 +130,7 @@ public class EventServiceTest extends Mockito {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/rgswerg"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect event id");
+        verify(response).sendError(SC_BAD_REQUEST, "Incorrect event id");
         verify(eventRepository, never()).getById(any());
         verify(eventRepository, never()).update(any());
     }
