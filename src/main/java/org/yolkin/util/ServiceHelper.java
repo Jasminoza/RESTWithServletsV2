@@ -59,8 +59,9 @@ public class ServiceHelper {
         this.resp = resp;
     }
 
-    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
+    public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
         this.eventRepository = eventRepository;
+        this.fileRepository = fileRepository;
         this.userRepository = userRepository;
         this.req = req;
         this.resp = resp;
@@ -69,8 +70,9 @@ public class ServiceHelper {
         this.MAX_MEMORY_SIZE = MAX_MEMORY_SIZE;
     }
 
-    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE, String mappingUrl) {
+    public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE, String mappingUrl) {
         this.eventRepository = eventRepository;
+        this.fileRepository = fileRepository;
         this.userRepository = userRepository;
         this.req = req;
         this.resp = resp;
@@ -377,9 +379,9 @@ public class ServiceHelper {
 
             file = fileRepository.update(fileForDB);
             fileItem.write(realFile);
-            makeCreateFileEvent(file);
+            makeUpdateFileEvent(file);
 
-            resp.setStatus(SC_CREATED);
+            resp.setStatus(SC_OK);
         } catch (Exception e) {
             resp.sendError(SC_NOT_IMPLEMENTED, "Can't save file on hard drive");
             return null;
