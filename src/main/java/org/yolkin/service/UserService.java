@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public User getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, mappingUrl);
 
         if (helper.userServiceGetByIdRequestIsCorrect()) {
             return helper.getUserById();
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     public User update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, mappingUrl);
 
         if(helper.userServiceUpdateRequestIsCorrect()) {
             return helper.updateUser();
@@ -61,7 +61,7 @@ public class UserService {
     }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, resp, req, mappingUrl);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, mappingUrl);
 
         if (helper.userServiceDeleteRequestIsCorrect()) {
            helper.deleteUser();

@@ -37,41 +37,50 @@ public class ServiceHelper {
     private int MAX_MEMORY_SIZE;
     private int MAX_FILE_SIZE;
 
-    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletResponse resp, HttpServletRequest req, String mappingUrl) {
+    public ServiceHelper(EventRepository eventRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
+        this.eventRepository = eventRepository;
+        this.req = req;
+        this.resp = resp;
+        this.mappingUrl = mappingUrl;
+    }
+
+    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.resp = resp;
         this.req = req;
+        this.resp = resp;
         this.mappingUrl = mappingUrl;
     }
 
     public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.resp = resp;
         this.req = req;
+        this.resp = resp;
     }
 
     public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
-        this.resp = resp;
         this.req = req;
+        this.resp = resp;
         this.PATH_FOR_UPLOADING = PATH_FOR_UPLOADING;
         this.MAX_FILE_SIZE = MAX_FILE_SIZE;
         this.MAX_MEMORY_SIZE = MAX_MEMORY_SIZE;
     }
 
-    public ServiceHelper(EventRepository eventRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
+    public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
         this.eventRepository = eventRepository;
+        this.fileRepository = fileRepository;
         this.resp = resp;
         this.req = req;
         this.mappingUrl = mappingUrl;
     }
 
-    public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
+    public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
         this.eventRepository = eventRepository;
         this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
         this.resp = resp;
         this.req = req;
         this.mappingUrl = mappingUrl;
@@ -121,7 +130,7 @@ public class ServiceHelper {
         String headerValue = req.getHeader(headerName);
 
         if (headerValue == null || headerValue.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, headerName + " can't be null");
+            resp.sendError(SC_BAD_REQUEST, headerName + " can't be null"); //todo:: add "header at the start of expression. fix tests.
             return false;
         }
 
@@ -209,12 +218,27 @@ public class ServiceHelper {
     }
 
     public User updateUser() {
-        userFromRepo = getUserById();
         userFromRepo.setName(usernameFromHeader);
         User updatedUser = userRepository.update(userFromRepo);
         makeUpdateUserEvent(updatedUser);
         resp.setStatus(SC_OK);
         return updatedUser;
+    }
+
+    public boolean fileServiceUpdateRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
+    }
+
+    public File updateFile() {
+        return null;
+
+
+//        File newFile = getFileFromRequest(, PATH_FOR_UPLOADING, date);
+//        newFile.setId(fileFromRepo.getId());
+//
+//        File updatedFile = fileRepository.update(newFile);
+//        resp.setStatus(SC_OK);
+//        return updatedFile;
     }
 
     public boolean eventServiceGetByIdRequestIsCorrect() throws IOException {
@@ -317,6 +341,18 @@ public class ServiceHelper {
     private void makeCreateFileEvent(File file) {
         Event event = new Event();
         event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been created.");
+        eventRepository.create(event);
+    }
+
+    private void makeUpdateFileEvent(File file) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been updated.");
+        eventRepository.create(event);
+    }
+
+    private void makeDeleteFileEvent(File file) {
+        Event event = new Event();
+        event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been deleted.");
         eventRepository.create(event);
     }
 

@@ -45,7 +45,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void getAllSuccess() throws IOException {
+    public void getAllEventsSuccess() throws IOException {
         when(eventRepository.getAll()).thenReturn(getEvents());
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/"));
 
@@ -58,7 +58,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void getByIdSuccess() throws IOException {
+    public void getEventByIdSuccess() throws IOException {
         when(eventRepository.getById(1L)).thenReturn(getEvents().get(0));
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/1"));
 
@@ -71,7 +71,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void getByIdFailedEventNotFound() throws IOException {
+    public void getEventByIdFailedEventNotFound() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/100"));
         when(eventRepository.getById(100L)).thenReturn(null);
 
@@ -84,7 +84,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void getByIdFailedIncorrectEventId() throws IOException {
+    public void getEventByIdFailedIncorrectEventId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/events/edfgsdf"));
 
         Event eventFromService = serviceUnderTest.getById(request, response, mappingUrl);
@@ -96,7 +96,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void deleteSuccess() throws IOException {
+    public void deleteEventSuccess() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/1"));
         when(eventRepository.getById(1L)).thenReturn(getEvents().get(0));
         serviceUnderTest.delete(request, response, mappingUrl);
@@ -107,7 +107,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void deleteFailedBlankEventId() throws IOException {
+    public void deleteEventFailedBlankEventId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
@@ -117,7 +117,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void deleteFailedEventNotFound() throws IOException {
+    public void deleteEventFailedEventNotFound() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/100"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
@@ -127,7 +127,7 @@ public class EventServiceTest extends Mockito {
     }
 
     @Test
-    public void deleteFailedIncorrectEventId() throws IOException {
+    public void deleteEventFailedIncorrectEventId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/events/rgswerg"));
         serviceUnderTest.delete(request, response, mappingUrl);
 
