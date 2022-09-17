@@ -339,6 +339,10 @@ public class ServiceHelper {
             fileForDB.setFilepath(realFile.getPath());
 
             file = fileRepository.create(fileForDB);
+            java.io.File uploadingDirectory = new java.io.File(PATH_FOR_UPLOADING);
+            if (!uploadingDirectory.exists()) {
+                uploadingDirectory.mkdir();
+            }
             fileItem.write(realFile);
             makeCreateFileEvent(file);
 

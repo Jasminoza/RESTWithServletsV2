@@ -77,7 +77,6 @@ public class FileServiceTest extends Mockito {
 
         File fileFromService = serviceUnderTest.create(request, response);
 
-
         assertEquals(getFileWithId(), fileFromService);
         verify(response, never()).sendError(anyInt(), anyString());
 
