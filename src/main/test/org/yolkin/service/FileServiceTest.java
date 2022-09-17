@@ -1,6 +1,5 @@
 package org.yolkin.service;
 
-import org.apache.commons.fileupload.FileItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,7 +11,6 @@ import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
 import org.yolkin.repository.UserRepository;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,7 +18,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import static javax.servlet.http.HttpServletResponse.*;
@@ -59,14 +56,15 @@ public class FileServiceTest extends Mockito {
 
     @Test
     public void getAllFilesSuccess() throws IOException {
-        when(fileRepository.getAll()).thenReturn(getFiles());
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/"));
+        when(fileRepository.getAll()).thenReturn(getFiles());
 
         List<File> filesFromService = serviceUnderTest.getAll();
 
         assertEquals(getFiles(), filesFromService);
         verify(fileRepository, times(1)).getAll();
         verify(response, never()).sendError(anyInt(), anyString());
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -80,16 +78,13 @@ public class FileServiceTest extends Mockito {
         //::TODO
 
 //        assertEquals(getFileWithId(), fileFromService);
-//        verify(response, never()).sendError(SC_BAD_REQUEST, "User id can't be null");
-//        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect user id.");
-//        verify(response, never()).sendError(SC_NOT_FOUND, "There is no user with such id.");
-//        verify(response, never()).sendError(SC_NOT_IMPLEMENTED, "Can't save file on hard drive");
-//        verify(response, never()).sendError(SC_NOT_ACCEPTABLE,  "Can't upload file or size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
+//        verify(response, never()).sendError(anyInt(), anyString());
 //
 //        verify(userRepository, times(1)).getById(1L);
 //        verify(fileRepository, times(1)).create(getFileWithoutId());
 //        verify(eventRepository, times(1)).create(any());
-//        verify(response, times(1)).setStatus(SC_CREATED);
+//        verify(response, times(1)).setStatus(SC_CREATED)
+        verify(eventRepository, times(1)).create(any());
     }
 
     @Test
@@ -106,20 +101,20 @@ public class FileServiceTest extends Mockito {
     }
 
     @Test
-    public void createFailedIncorrectUserId() throws IOException {
+    public void createFileFailedIncorrectUserId() throws IOException {
         when(request.getHeader("user_id")).thenReturn("ghdgsdfg");
 
         File file = serviceUnderTest.create(request, response);
 
         assertNull(file);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id is incorrect");
         verify(userRepository, never()).getById(any());
         verify(fileRepository, never()).create(any());
         verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void createFailedUserNotFound() throws IOException {
+    public void createFileFailedUserNotFound() throws IOException {
         when(request.getHeader("user_id")).thenReturn("1");
 
         File file = serviceUnderTest.create(request, response);
@@ -132,33 +127,34 @@ public class FileServiceTest extends Mockito {
     }
 
     @Test
-    public void getByIdSusses() throws IOException {
-        when(fileRepository.getById(1L)).thenReturn(getFiles().get(0));
+    public void getFileByIdSuccess() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
+        when(fileRepository.getById(1L)).thenReturn(getFileWithId());
 
         File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
-        assertEquals(getFiles().get(0), fileFromService);
+        assertEquals(getFileWithId(), fileFromService);
         verify(fileRepository, times(1)).getById(1L);
-        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect file id");
-        verify(response, never()).sendError(SC_NOT_FOUND, "There is no file with such id");
+        verify(response, never()).sendError(anyInt(), anyString());
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void getByIdFailedEventNotFound() throws IOException {
-        when(fileRepository.getById(100L)).thenReturn(null);
+    public void getFileByIdFailedFileNotFound() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/100"));
+        when(fileRepository.getById(100L)).thenReturn(null);
 
         File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
 
         assertNull(fileFromService);
         verify(fileRepository, times(1)).getById(100L);
-        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect file id");
         verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no file with such id");
+        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect file id");
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void getByIdFailedIncorrectEventId() throws IOException {
+    public void getFileByIdFailedIncorrectFileId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/edfgsdf"));
 
         File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
@@ -167,95 +163,130 @@ public class FileServiceTest extends Mockito {
         verify(fileRepository, never()).getById(any());
         verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(response, never()).sendError(SC_NOT_FOUND, "There is no file with such id");
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void updateFailedBlankUserId() throws IOException {
+    public void updateFileFailedBlankUserId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
+        when(fileRepository.getById(1L)).thenReturn(getFileWithId());
         when(request.getHeader("user_id")).thenReturn(" ");
 
-        File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
+        File fileFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(fileFromService);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id can't be null");
         verify(response, never()).setStatus(SC_OK);
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void updateFailedUserNotFound() throws IOException {
+    public void updateFileFailedUserNotFound() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
+        when(fileRepository.getById(1L)).thenReturn(getFileWithId());
         when(userRepository.getById(1L)).thenReturn(null);
         when(request.getHeader("user_id")).thenReturn("1");
 
-        File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
+        File fileFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(fileFromService);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "User not found");
+        verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(response, never()).setStatus(SC_OK);
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void updateFailedIncorrectUserId() throws IOException {
+    public void updateFileFailedIncorrectUserId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
+        when(fileRepository.getById(1L)).thenReturn(getFileWithId());
         when(request.getHeader("user_id")).thenReturn("dfgjknsdfk");
 
-        File fileFromService = serviceUnderTest.getById(request, response, mappingUrl);
+        File fileFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(fileFromService);
         verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id is incorrect");
         verify(response, never()).setStatus(SC_OK);
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void updateSuccess() throws IOException {
+    public void updateFileSuccess() throws IOException {
         //::TODO
+
+        File fileFromService = serviceUnderTest.update(request, response, mappingUrl);
+
+        assertNull(fileFromService);
+        verify(eventRepository, times(1)).create(any());
     }
 
     @Test
-    public void deleteSuccess() throws IOException {
+    public void deleteFileSuccess() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/files/1"));
-        when(fileRepository.getById(1L)).thenReturn(getFiles().get(0));
+        when(request.getHeader("user_id")).thenReturn("1");
+        when(userRepository.getById(1L)).thenReturn(getUsers().get(0));
+        when(fileRepository.getById(1L)).thenReturn(getFileWithId());
+
         serviceUnderTest.delete(request, response, mappingUrl);
 
         verify(fileRepository, times(1)).getById(1L);
-        verify(fileRepository, times(1)).delete(any());
+        verify(fileRepository, times(1)).delete(1L);
         verify(response, times(1)).setStatus(SC_NO_CONTENT);
+        verify(eventRepository, times(1)).create(any());
     }
 
     @Test
-    public void deleteFailedBlankUserId() throws IOException {
+    public void deleteFileFailedBlankFileId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8080/api/v1/files/"));
+
         serviceUnderTest.delete(request, response, mappingUrl);
 
         verify(response).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(fileRepository, never()).getById(any());
         verify(fileRepository, never()).delete(any());
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void deleteFailedUserNotFound() throws IOException {
+    public void deleteFileFailedFileNotFound() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
-        when(fileRepository.getById(1L)).thenReturn(getFiles().get(0));
+        when(fileRepository.getById(1L)).thenReturn(null);
+        when(userRepository.getById(1L)).thenReturn(getUsers().get(0));
+        when(request.getHeader("user_id")).thenReturn("1");
+
+        serviceUnderTest.delete(request, response, mappingUrl);
+
+        verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no file with such id");
+        verify(fileRepository, never()).delete(1L);
+        verify(response, never()).setStatus(SC_NO_CONTENT);
+        verify(eventRepository, never()).create(any());
+    }
+
+    @Test
+    public void deleteFileFailedUserNotFound() throws IOException {
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
+        when(fileRepository.getById(1L)).thenReturn(getFileWithId());
         when(userRepository.getById(1L)).thenReturn(null);
         when(request.getHeader("user_id")).thenReturn("1");
 
         serviceUnderTest.delete(request, response, mappingUrl);
 
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "User not found");
-        verify(fileRepository, never()).delete(anyLong());
+        verify(response, times(1)).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(response, never()).setStatus(SC_NO_CONTENT);
+        verify(fileRepository, never()).delete(1L);
+        verify(eventRepository, never()).create(any());
     }
 
     @Test
-    public void deleteFailedIncorrectUserId() throws IOException {
+    public void deleteFileFailedIncorrectUserId() throws IOException {
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/1"));
         when(request.getHeader("user_id")).thenReturn("dfgjknsdfk");
 
         serviceUnderTest.delete(request, response, mappingUrl);
 
         verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id is incorrect");
-        verify(fileRepository, never()).delete(anyLong());
         verify(response, never()).setStatus(SC_OK);
+        verify(fileRepository, never()).delete(1L);
+        verify(eventRepository, never()).create(any());
     }
 
     private List<File> getFiles() {

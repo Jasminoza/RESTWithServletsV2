@@ -142,7 +142,7 @@ public class ServiceHelper {
            try {
                userIdFromHeader = Long.valueOf(headerValue);
            } catch (NumberFormatException e) {
-               resp.sendError(SC_BAD_REQUEST, "Incorrect id");
+               resp.sendError(SC_BAD_REQUEST, "user_id is incorrect");
                return false;
            }
         }
@@ -226,7 +226,7 @@ public class ServiceHelper {
     }
 
     public boolean fileServiceUpdateRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
     }
 
     public File updateFile() {
@@ -285,11 +285,12 @@ public class ServiceHelper {
     }
 
     public boolean fileServiceDeleteRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
     }
 
     public void deleteFile() {
         resp.setStatus(SC_NO_CONTENT);
+        makeDeleteFileEvent(fileFromRepo);
         fileRepository.delete(idFromRequest);
     }
 

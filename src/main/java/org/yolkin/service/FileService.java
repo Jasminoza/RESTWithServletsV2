@@ -113,7 +113,7 @@ public class FileService {
 }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, req, resp, mappingUrl);
+        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, mappingUrl);
 
         if (helper.fileServiceDeleteRequestIsCorrect()) {
             helper.deleteFile();
