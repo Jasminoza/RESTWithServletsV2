@@ -340,19 +340,22 @@ public class ServiceHelper {
 
     private void makeCreateFileEvent(File file) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been created.");
+        User user = userRepository.getById(userIdFromHeader);
+        event.setEvent("[" + new Date() + "] " + "INFO: User{id: " + user.getId() + " name: " + user.getName() + "} created " + "File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "}");
         eventRepository.create(event);
     }
 
     private void makeUpdateFileEvent(File file) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been updated.");
+        User user = userRepository.getById(userIdFromHeader);
+        event.setEvent("[" + new Date() + "] " + "INFO: User{id: " + user.getId() + " name: " + user.getName() + "} updated " + "File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "}");
         eventRepository.create(event);
     }
 
     private void makeDeleteFileEvent(File file) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO: File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "} has been deleted.");
+        User user = userRepository.getById(userIdFromHeader);
+        event.setEvent("[" + new Date() + "] " + "INFO: User{id: " + user.getId() + " name: " + user.getName() + "} deleted " + "File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "}");
         eventRepository.create(event);
     }
 

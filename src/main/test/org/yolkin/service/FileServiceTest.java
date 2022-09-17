@@ -58,7 +58,7 @@ public class FileServiceTest extends Mockito {
     }
 
     @Test
-    public void getAllSuccess() throws IOException {
+    public void getAllFilesSuccess() throws IOException {
         when(fileRepository.getAll()).thenReturn(getFiles());
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8088/api/v1/files/"));
 
@@ -66,12 +66,11 @@ public class FileServiceTest extends Mockito {
 
         assertEquals(getFiles(), filesFromService);
         verify(fileRepository, times(1)).getAll();
-        verify(response, never()).sendError(SC_BAD_REQUEST, "Incorrect file id");
-        verify(response, never()).sendError(SC_NOT_FOUND, "There is no event with such id");
+        verify(response, never()).sendError(anyInt(), anyString());
     }
 
     @Test
-    public void createSuccess() throws IOException {
+    public void createFileSuccess() throws IOException {
         when(request.getHeader("user_id")).thenReturn("1");
         when(userRepository.getById(1L)).thenReturn(getUsers().get(0));
         when(fileRepository.create(getFileWithoutId())).thenReturn(getFileWithId());
@@ -94,7 +93,7 @@ public class FileServiceTest extends Mockito {
     }
 
     @Test
-    public void createFailedBlankUserId() throws IOException {
+    public void createFileFailedBlankUserId() throws IOException {
         when(request.getHeader("user_id")).thenReturn(" ");
 
         File file = serviceUnderTest.create(request, response);
