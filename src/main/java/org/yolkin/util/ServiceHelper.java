@@ -396,49 +396,53 @@ public class ServiceHelper {
     private void makeCreateFileEvent(File file) {
         Event event = new Event();
         User user = userRepository.getById(userIdFromHeader);
-        event.setEvent(
-                "[" + new Date() + "] " +
-                "INFO: User{id: " + user.getId() + ", name: " + user.getName() + "} created " +
-                "File{id: " + file.getId() + ", name: " + file.getName() + ", filepath: " + file.getFilepath() + ", date of uploading: " + file.getDateOfUploading() + "}"
-        );
+        event.setEvent(formFileEventText("INFO", user, file, "created"));
         eventRepository.create(event);
     }
 
     private void makeUpdateFileEvent(File file) {
         Event event = new Event();
         User user = userRepository.getById(userIdFromHeader);
-        event.setEvent(
-                "[" + new Date() + "] " +
-                        "INFO: User{id: " + user.getId() + ", name: " + user.getName() + "} updated " +
-                        "File{id: " + file.getId() + ", name: " + file.getName() + ", filepath: " + file.getFilepath() + ", date of uploading: " + file.getDateOfUploading() + "}"
-        );        eventRepository.create(event);
+        event.setEvent(formFileEventText("INFO", user, file, "updated"));
+        eventRepository.create(event);
     }
 
     private void makeDeleteFileEvent(File file) {
         Event event = new Event();
         User user = userRepository.getById(userIdFromHeader);
-        event.setEvent(
-                "[" + new Date() + "] " +
-                        "INFO: User{id: " + user.getId() + ", name: " + user.getName() + "} deleted " +
-                        "File{id: " + file.getId() + ", name: " + file.getName() + ", filepath: " + file.getFilepath() + ", date of uploading: " + file.getDateOfUploading() + "}"
-        );        eventRepository.create(event);
+        event.setEvent(formFileEventText("INFO", user, file, "deleted"));
+        eventRepository.create(event);
+    }
+
+    private String formFileEventText(String status, User user, File file, String whatWasDone) {
+        return String.format(
+                "[ %s ] %s: User{id: %s, name: %s} %s File{id: %s, name: %s, filepath: %s, date of uploading: %s}",
+                new Date(), status, user.getId(), user.getName(), whatWasDone, file.getId(), file.getName(), file.getFilepath(), file.getDateOfUploading()
+        );
     }
 
     private void makeCreateUserEvent(User user) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + ", name: " + user.getName() + "} has been created.");
+        event.setEvent(formUserEventText("INFO", user, "created"));
         eventRepository.create(event);
     }
 
     private void makeUpdateUserEvent(User user) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + ", name: " + user.getName() + "} has been updated.");
+        event.setEvent(formUserEventText("INFO", user, "updated"));
         eventRepository.create(event);
     }
 
     private void makeDeleteUserEvent(User user) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + ", name: " + user.getName() + "} has been deleted.");
+        event.setEvent(formUserEventText("INFO", user, "deleted"));
         eventRepository.create(event);
+    }
+
+    private String formUserEventText(String status, User user, String whatWasDone) {
+        return String.format(
+                "[ %s ] %s: User{id: %s, name: %s} %s",
+                new Date(), status, user.getId(), user.getName(), whatWasDone
+        );
     }
 }
