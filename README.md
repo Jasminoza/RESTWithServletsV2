@@ -17,4 +17,5 @@
 7. ###### Взаимодействие с пользователем необходимо реализовать с помощью Postman (https://www.getpostman.com/)
 
 ##### Для запуска приложения необходимо иметь настроенный MySQL сервер, и создать базу данных.
+#### JSON link - для тестов Postman: https://www.getpostman.com/collections/d5ac36f850f67519a11c
 ### Технологии: Java, MySQL, Hibernate, HTTP, Servlets, Maven, Flyway.
