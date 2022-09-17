@@ -338,12 +338,12 @@ public class ServiceHelper {
             fileForDB.setDateOfUploading(date);
             fileForDB.setFilepath(realFile.getPath());
 
-            file = fileRepository.create(fileForDB);
             java.io.File uploadingDirectory = new java.io.File(PATH_FOR_UPLOADING);
             if (!uploadingDirectory.exists()) {
                 uploadingDirectory.mkdir();
             }
             fileItem.write(realFile);
+            file = fileRepository.create(fileForDB);
             makeCreateFileEvent(file);
 
             resp.setStatus(SC_CREATED);
@@ -381,8 +381,8 @@ public class ServiceHelper {
             fileForDB.setDateOfUploading(date);
             fileForDB.setFilepath(realFile.getPath());
 
-            file = fileRepository.update(fileForDB);
             fileItem.write(realFile);
+            file = fileRepository.update(fileForDB);
             makeUpdateFileEvent(file);
 
             resp.setStatus(SC_OK);
