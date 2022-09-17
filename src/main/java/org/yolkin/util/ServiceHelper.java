@@ -234,7 +234,7 @@ public class ServiceHelper {
         String headerValue = req.getHeader(headerName);
 
         if (headerValue == null || headerValue.isBlank()) {
-            resp.sendError(SC_BAD_REQUEST, headerName + " can't be null"); //todo:: add "header at the start of expression. fix tests.
+            resp.sendError(SC_BAD_REQUEST, "Header \"" + headerName + "\" can't be null");
             return false;
         }
 

@@ -95,7 +95,7 @@ public class FileServiceTest extends Mockito {
         File file = serviceUnderTest.create(request, response);
 
         assertNull(file);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id can't be null");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Header \"user_id\" can't be null");
         verify(userRepository, never()).getById(any());
         verify(fileRepository, never()).create(any());
         verify(eventRepository, never()).create(any());
@@ -176,7 +176,7 @@ public class FileServiceTest extends Mockito {
         File fileFromService = serviceUnderTest.update(request, response, mappingUrl);
 
         assertNull(fileFromService);
-        verify(response, times(1)).sendError(SC_BAD_REQUEST, "user_id can't be null");
+        verify(response, times(1)).sendError(SC_BAD_REQUEST, "Header \"user_id\" can't be null");
         verify(response, never()).setStatus(SC_OK);
         verify(eventRepository, never()).create(any());
     }

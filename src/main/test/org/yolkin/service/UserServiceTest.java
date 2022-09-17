@@ -86,7 +86,7 @@ public class UserServiceTest extends Mockito {
 
         assertNull(userFromService);
         verify(req, times(1)).getHeader("username");
-        verify(resp, times(1)).sendError(SC_BAD_REQUEST, "username can't be null");
+        verify(resp, times(1)).sendError(SC_BAD_REQUEST, "Header \"username\" can't be null");
         verify(userRepository, never()).create(any());
         verify(eventRepository, never()).create(any());
     }
@@ -150,7 +150,7 @@ public class UserServiceTest extends Mockito {
         User userFromService = serviceUnderTest.update(req, resp, mappingUrl);
 
         assertNull(userFromService);
-        verify(resp).sendError(SC_BAD_REQUEST, "username can't be null");
+        verify(resp).sendError(SC_BAD_REQUEST, "Header \"username\" can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
         verify(eventRepository, never()).create(any());
