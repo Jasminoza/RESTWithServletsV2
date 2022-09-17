@@ -396,39 +396,49 @@ public class ServiceHelper {
     private void makeCreateFileEvent(File file) {
         Event event = new Event();
         User user = userRepository.getById(userIdFromHeader);
-        event.setEvent("[" + new Date() + "] " + "INFO: User{id: " + user.getId() + " name: " + user.getName() + "} created " + "File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "}");
+        event.setEvent(
+                "[" + new Date() + "] " +
+                "INFO: User{id: " + user.getId() + ", name: " + user.getName() + "} created " +
+                "File{id: " + file.getId() + ", name: " + file.getName() + ", filepath: " + file.getFilepath() + ", date of uploading: " + file.getDateOfUploading() + "}"
+        );
         eventRepository.create(event);
     }
 
     private void makeUpdateFileEvent(File file) {
         Event event = new Event();
         User user = userRepository.getById(userIdFromHeader);
-        event.setEvent("[" + new Date() + "] " + "INFO: User{id: " + user.getId() + " name: " + user.getName() + "} updated " + "File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "}");
-        eventRepository.create(event);
+        event.setEvent(
+                "[" + new Date() + "] " +
+                        "INFO: User{id: " + user.getId() + ", name: " + user.getName() + "} updated " +
+                        "File{id: " + file.getId() + ", name: " + file.getName() + ", filepath: " + file.getFilepath() + ", date of uploading: " + file.getDateOfUploading() + "}"
+        );        eventRepository.create(event);
     }
 
     private void makeDeleteFileEvent(File file) {
         Event event = new Event();
         User user = userRepository.getById(userIdFromHeader);
-        event.setEvent("[" + new Date() + "] " + "INFO: User{id: " + user.getId() + " name: " + user.getName() + "} deleted " + "File{id: " + file.getId() + " name: " + file.getName() + " filepath: " + file.getFilepath() + " date of uploading: " + file.getDateOfUploading() + "}");
-        eventRepository.create(event);
+        event.setEvent(
+                "[" + new Date() + "] " +
+                        "INFO: User{id: " + user.getId() + ", name: " + user.getName() + "} deleted " +
+                        "File{id: " + file.getId() + ", name: " + file.getName() + ", filepath: " + file.getFilepath() + ", date of uploading: " + file.getDateOfUploading() + "}"
+        );        eventRepository.create(event);
     }
 
     private void makeCreateUserEvent(User user) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been created.");
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + ", name: " + user.getName() + "} has been created.");
         eventRepository.create(event);
     }
 
     private void makeUpdateUserEvent(User user) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been updated.");
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + ", name: " + user.getName() + "} has been updated.");
         eventRepository.create(event);
     }
 
     private void makeDeleteUserEvent(User user) {
         Event event = new Event();
-        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been deleted.");
+        event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + ", name: " + user.getName() + "} has been deleted.");
         eventRepository.create(event);
     }
 }
