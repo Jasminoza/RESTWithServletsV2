@@ -69,6 +69,17 @@ public class ServiceHelper {
         this.MAX_MEMORY_SIZE = MAX_MEMORY_SIZE;
     }
 
+    public ServiceHelper(EventRepository eventRepository, UserRepository userRepository, HttpServletRequest req, HttpServletResponse resp, String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE, String mappingUrl) {
+        this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
+        this.req = req;
+        this.resp = resp;
+        this.PATH_FOR_UPLOADING = PATH_FOR_UPLOADING;
+        this.MAX_FILE_SIZE = MAX_FILE_SIZE;
+        this.MAX_MEMORY_SIZE = MAX_MEMORY_SIZE;
+        this.mappingUrl = mappingUrl;
+    }
+
     public ServiceHelper(EventRepository eventRepository, FileRepository fileRepository, HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
         this.eventRepository = eventRepository;
         this.fileRepository = fileRepository;
@@ -86,7 +97,114 @@ public class ServiceHelper {
         this.mappingUrl = mappingUrl;
     }
 
-    public ServletFileUpload setupUploader(String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
+    public boolean userServiceCreateRequestIsCorrect() throws IOException {
+        return headerNotBlank("username");
+    }
+
+    public User createUser() {
+        User user = new User();
+        user.setName(usernameFromHeader);
+        user = userRepository.create(user);
+        makeCreateUserEvent(user);
+        resp.setStatus(SC_CREATED);
+        return user;
+    }
+
+    public boolean userServiceGetByIdRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
+    }
+
+    public User getUserById() {
+        return userFromRepo;
+    }
+
+    public boolean userServiceUpdateRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("username") && userWasFound();
+    }
+
+    public User updateUser() {
+        userFromRepo.setName(usernameFromHeader);
+        User updatedUser = userRepository.update(userFromRepo);
+        makeUpdateUserEvent(updatedUser);
+        resp.setStatus(SC_OK);
+        return updatedUser;
+    }
+
+    public boolean userServiceDeleteRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
+    }
+
+    public void deleteUser() {
+        userRepository.delete(idFromRequest);
+        resp.setStatus(SC_NO_CONTENT);
+        makeDeleteUserEvent(userFromRepo);
+    }
+
+    public boolean fileServiceCreateRequestIsCorrect() throws IOException {
+        return headerNotBlank("user_id") && userFromHeaderWasFound();
+    }
+
+    public File createFile() throws IOException {
+        ServletFileUpload uploader = setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
+        return getFileFromRequest(uploader);
+    }
+
+    public boolean fileServiceGetByIdRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
+    }
+
+    public File getFileById() {
+        return fileFromRepo;
+    }
+
+    public boolean fileServiceUpdateRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
+    }
+
+    public File updateFile() {
+        return null;
+
+
+//        File newFile = getFileFromRequest(, PATH_FOR_UPLOADING, date);
+//        newFile.setId(fileFromRepo.getId());
+//
+//        File updatedFile = fileRepository.update(newFile);
+//        resp.setStatus(SC_OK);
+//        return updatedFile;
+    }
+
+    public boolean fileServiceDeleteRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
+    }
+
+    public void deleteFile() {
+        resp.setStatus(SC_NO_CONTENT);
+        makeDeleteFileEvent(fileFromRepo);
+        fileRepository.delete(idFromRequest);
+    }
+
+    public boolean eventServiceGetByIdRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
+    }
+
+    public Event getEventById() {
+        return eventFromRepo;
+    }
+
+    public boolean eventServiceDeleteRequestIsCorrect() throws IOException {
+        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
+    }
+
+    public void deleteEvent() {
+        resp.setStatus(SC_NO_CONTENT);
+        eventRepository.delete(idFromRequest);
+    }
+
+
+
+
+
+    private ServletFileUpload setupUploader(String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
         DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
         diskFileItemFactory.setRepository(new java.io.File(PATH_FOR_UPLOADING));
         diskFileItemFactory.setSizeThreshold(MAX_MEMORY_SIZE);
@@ -97,7 +215,7 @@ public class ServiceHelper {
         return uploader;
     }
 
-    public java.io.File getFileFromRequest(FileItem fileItem, String PATH_FOR_UPLOADING, Date date) {
+    private java.io.File getFileFromRequest(FileItem fileItem, String PATH_FOR_UPLOADING, Date date) {
         java.io.File realFile;
 
         String fileName = fileItem.getName();
@@ -110,20 +228,6 @@ public class ServiceHelper {
         }
 
         return realFile;
-    }
-
-    public User createUser() {
-        User user = new User();
-        user.setName(req.getHeader("username"));
-        user = userRepository.create(user);
-        makeCreateUserEvent(user);
-        resp.setStatus(SC_CREATED);
-        return user;
-    }
-
-    public boolean userServiceCreateRequestIsCorrect() throws IOException {
-        String headerName = "username";
-        return headerNotBlank(headerName);
     }
 
     private boolean headerNotBlank(String headerName) throws IOException {
@@ -150,10 +254,6 @@ public class ServiceHelper {
         return true;
     }
 
-    public boolean userServiceGetByIdRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
-    }
-
     private boolean idFromUrlIsCorrect(String idFromUrl) throws IOException {
         try {
             idFromRequest = Long.valueOf(idFromUrl);
@@ -162,10 +262,6 @@ public class ServiceHelper {
             resp.sendError(SC_BAD_REQUEST, "Incorrect id");
             return false;
         }
-    }
-
-    public User getUserById() {
-        return userFromRepo;
     }
 
     private boolean userWasFound() throws IOException {
@@ -188,20 +284,9 @@ public class ServiceHelper {
         return true;
     }
 
-
-    public boolean userServiceDeleteRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && userWasFound();
-    }
-
     private String getIdFromUrl() {
         String url = req.getRequestURL().toString();
         return url.substring(url.indexOf(mappingUrl) + mappingUrl.length());
-    }
-
-    public void deleteUser() {
-        userRepository.delete(idFromRequest);
-        resp.setStatus(SC_NO_CONTENT);
-        makeDeleteUserEvent(userFromRepo);
     }
 
     private boolean requestUrlContainsId() throws IOException {
@@ -213,38 +298,6 @@ public class ServiceHelper {
         return true;
     }
 
-    public boolean userServiceUpdateRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("username") && userWasFound();
-    }
-
-    public User updateUser() {
-        userFromRepo.setName(usernameFromHeader);
-        User updatedUser = userRepository.update(userFromRepo);
-        makeUpdateUserEvent(updatedUser);
-        resp.setStatus(SC_OK);
-        return updatedUser;
-    }
-
-    public boolean fileServiceUpdateRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
-    }
-
-    public File updateFile() {
-        return null;
-
-
-//        File newFile = getFileFromRequest(, PATH_FOR_UPLOADING, date);
-//        newFile.setId(fileFromRepo.getId());
-//
-//        File updatedFile = fileRepository.update(newFile);
-//        resp.setStatus(SC_OK);
-//        return updatedFile;
-    }
-
-    public boolean eventServiceGetByIdRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
-    }
-
     private boolean eventWasFound() throws IOException {
         eventFromRepo = eventRepository.getById(idFromRequest);
         if (eventFromRepo == null) {
@@ -252,23 +305,6 @@ public class ServiceHelper {
             return false;
         }
         return true;
-    }
-
-    public Event getEventById() {
-        return eventFromRepo;
-    }
-
-    public boolean eventServiceDeleteRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && eventWasFound();
-    }
-
-    public void deleteEvent() {
-        resp.setStatus(SC_NO_CONTENT);
-        eventRepository.delete(idFromRequest);
-    }
-
-    public boolean fileServiceGetByIdRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && fileWasFound();
     }
 
     private boolean fileWasFound() throws IOException {
@@ -280,28 +316,8 @@ public class ServiceHelper {
         return true;
     }
 
-    public File getFileById() {
-        return fileFromRepo;
-    }
-
-    public boolean fileServiceDeleteRequestIsCorrect() throws IOException {
-        return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
-    }
-
-    public void deleteFile() {
-        resp.setStatus(SC_NO_CONTENT);
-        makeDeleteFileEvent(fileFromRepo);
-        fileRepository.delete(idFromRequest);
-    }
-
-    public boolean fileServiceCreateRequestIsCorrect() throws IOException {
-        return headerNotBlank("user_id") && userFromHeaderWasFound();
-    }
-
-    public File createFile() throws IOException {
-        ServletFileUpload uploader = setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
+    private File getFileFromRequest(ServletFileUpload uploader) throws IOException {
         File file = null;
-
         try {
             Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
             while (iterator.hasNext()) {
@@ -360,19 +376,19 @@ public class ServiceHelper {
         eventRepository.create(event);
     }
 
-    public void makeCreateUserEvent(User user) {
+    private void makeCreateUserEvent(User user) {
         Event event = new Event();
         event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been created.");
         eventRepository.create(event);
     }
 
-    public void makeUpdateUserEvent(User user) {
+    private void makeUpdateUserEvent(User user) {
         Event event = new Event();
         event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been updated.");
         eventRepository.create(event);
     }
 
-    public void makeDeleteUserEvent(User user) {
+    private void makeDeleteUserEvent(User user) {
         Event event = new Event();
         event.setEvent("[" + new Date() + "] " + "INFO:  User{id: " + user.getId() + " name: " + user.getName() + "} has been deleted.");
         eventRepository.create(event);

@@ -59,7 +59,7 @@ public class FileService {
     }
 
     public File update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, mappingUrl);
+        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE, mappingUrl);
 
         if (helper.fileServiceUpdateRequestIsCorrect()) {
             return helper.updateFile();
