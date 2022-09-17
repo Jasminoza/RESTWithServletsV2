@@ -146,7 +146,7 @@ public class ServiceHelper {
 
     public File createFile() throws IOException {
         ServletFileUpload uploader = setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
-        return getFileFromRequest(uploader);
+        return saveFileFromRequest(uploader);
     }
 
     public boolean fileServiceGetByIdRequestIsCorrect() throws IOException {
@@ -161,16 +161,9 @@ public class ServiceHelper {
         return requestUrlContainsId() && idFromUrlIsCorrect(idFromUrl) && headerNotBlank("user_id") && userFromHeaderWasFound() && fileWasFound();
     }
 
-    public File updateFile() {
-        return null;
-
-
-//        File newFile = getFileFromRequest(, PATH_FOR_UPLOADING, date);
-//        newFile.setId(fileFromRepo.getId());
-//
-//        File updatedFile = fileRepository.update(newFile);
-//        resp.setStatus(SC_OK);
-//        return updatedFile;
+    public File updateFile() throws IOException {
+        ServletFileUpload uploader = setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
+        return updateFileFromRequest(uploader);
     }
 
     public boolean fileServiceDeleteRequestIsCorrect() throws IOException {
@@ -215,7 +208,7 @@ public class ServiceHelper {
         return uploader;
     }
 
-    private java.io.File getFileFromRequest(FileItem fileItem, String PATH_FOR_UPLOADING, Date date) {
+    private java.io.File saveFileFromRequest(FileItem fileItem, String PATH_FOR_UPLOADING, Date date) {
         java.io.File realFile;
 
         String fileName = fileItem.getName();
@@ -316,7 +309,7 @@ public class ServiceHelper {
         return true;
     }
 
-    private File getFileFromRequest(ServletFileUpload uploader) throws IOException {
+    private File saveFileFromRequest(ServletFileUpload uploader) throws IOException {
         File file = null;
         try {
             Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
@@ -324,8 +317,8 @@ public class ServiceHelper {
                 FileItem fileItem = iterator.next();
                 Date date = new Date();
                 if (!fileItem.isFormField()) {
-                    java.io.File realFile = getFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
-                    file = saveFile(realFile, fileItem, date);
+                    java.io.File realFile = saveFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
+                    file = saveNewFileToHDD(realFile, fileItem, date);
                 }
             }
         } catch (FileUploadException e) {
@@ -335,7 +328,7 @@ public class ServiceHelper {
         return file;
     }
 
-    private File saveFile(java.io.File realFile, FileItem fileItem, Date date) throws IOException {
+    private File saveNewFileToHDD(java.io.File realFile, FileItem fileItem, Date date) throws IOException {
         File file;
         try {
             File fileForDB = new File();
@@ -344,6 +337,45 @@ public class ServiceHelper {
             fileForDB.setFilepath(realFile.getPath());
 
             file = fileRepository.create(fileForDB);
+            fileItem.write(realFile);
+            makeCreateFileEvent(file);
+
+            resp.setStatus(SC_CREATED);
+        } catch (Exception e) {
+            resp.sendError(SC_NOT_IMPLEMENTED, "Can't save file on hard drive");
+            return null;
+        }
+        return file;
+    }
+
+    private File updateFileFromRequest(ServletFileUpload uploader) throws IOException {
+        File file = null;
+        try {
+            Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
+            while (iterator.hasNext()) {
+                FileItem fileItem = iterator.next();
+                Date date = new Date();
+                if (!fileItem.isFormField()) {
+                    java.io.File realFile = saveFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
+                    file = updateFileOnHDD(realFile, fileItem, date);
+                }
+            }
+        } catch (FileUploadException e) {
+            resp.sendError(SC_NOT_ACCEPTABLE, "Can't upload file or size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
+            return null;
+        }
+        return file;
+    }
+
+    private File updateFileOnHDD(java.io.File realFile, FileItem fileItem, Date date) throws IOException {
+        File file;
+        try {
+            File fileForDB = fileFromRepo;
+            fileForDB.setName(realFile.getName());
+            fileForDB.setDateOfUploading(date);
+            fileForDB.setFilepath(realFile.getPath());
+
+            file = fileRepository.update(fileForDB);
             fileItem.write(realFile);
             makeCreateFileEvent(file);
 
