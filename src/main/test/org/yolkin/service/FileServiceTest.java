@@ -69,21 +69,22 @@ public class FileServiceTest extends Mockito {
 
     @Test
     public void createFileSuccess() throws IOException {
+        //::TODO
+
         when(request.getHeader("user_id")).thenReturn("1");
         when(userRepository.getById(1L)).thenReturn(getUsers().get(0));
         when(fileRepository.create(getFileWithoutId())).thenReturn(getFileWithId());
 
         File fileFromService = serviceUnderTest.create(request, response);
 
-        //::TODO
 
-//        assertEquals(getFileWithId(), fileFromService);
-//        verify(response, never()).sendError(anyInt(), anyString());
-//
-//        verify(userRepository, times(1)).getById(1L);
-//        verify(fileRepository, times(1)).create(getFileWithoutId());
-//        verify(eventRepository, times(1)).create(any());
-//        verify(response, times(1)).setStatus(SC_CREATED)
+        assertEquals(getFileWithId(), fileFromService);
+        verify(response, never()).sendError(anyInt(), anyString());
+
+        verify(userRepository, times(1)).getById(1L);
+        verify(fileRepository, times(1)).create(getFileWithoutId());
+        verify(eventRepository, times(1)).create(any());
+        verify(response, times(1)).setStatus(SC_CREATED);
         verify(eventRepository, times(1)).create(any());
     }
 
