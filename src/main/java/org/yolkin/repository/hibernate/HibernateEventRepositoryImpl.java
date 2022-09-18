@@ -14,8 +14,8 @@ public class HibernateEventRepositoryImpl implements EventRepository {
         try (Session session = getSession()) {
             return session.createQuery(
                     "select e From Event as e " +
-                            "join fetch e.file" +
-                            "join fetch e.user",
+                            "OUTER join fetch e.file" +
+                            "OUTER join fetch e.user",
                     Event.class
             ).list();
         }
@@ -29,7 +29,12 @@ public class HibernateEventRepositoryImpl implements EventRepository {
     @Override
     public Event getById(Long id) {
         try (Session session = getSession()) {
-            return session.get(Event.class, id);
+            return session.createQuery(
+                    "select e From Event as e " +
+                            "OUTER join fetch e.file" +
+                            "OUTER join fetch e.user where e.id=" + id,
+                    Event.class
+            ).list().get(0);
         }
     }
 
