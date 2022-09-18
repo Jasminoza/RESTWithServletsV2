@@ -63,7 +63,15 @@ public class HibernateEventRepositoryImpl implements EventRepository {
 
         try (Session session = getSession()) {
             transaction = session.beginTransaction();
-            event = session.merge(event);
+//            event = session.merge(event);
+
+            session.createNativeQuery(
+                    String.format(
+                            "INSERT INTO events " +
+                                    "(date, user_id, event_type, file_id) VALUES (now(), %s, %s, %s)",
+                            event.getUser().getId(), event.getEventType(), event.getFile().getId()),
+                    Event.class).executeUpdate();
+
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {

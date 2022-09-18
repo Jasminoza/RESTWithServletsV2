@@ -19,7 +19,7 @@ public class File {
     @Column(name = "file_path")
     private String filepath;
 
-    @OneToMany(mappedBy = "file")
+    @OneToMany(mappedBy = "file", fetch = FetchType.LAZY)
     private List<Event> events;
 
     public File() {

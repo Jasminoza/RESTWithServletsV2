@@ -15,7 +15,7 @@ public class User {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Event> events;
 
     public User() {

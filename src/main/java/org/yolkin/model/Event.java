@@ -23,7 +23,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
     private File file;
 
