@@ -69,7 +69,7 @@ public class HibernateEventRepositoryImpl implements EventRepository {
                     String.format(
                             "INSERT INTO events " +
                                     "(date, user_id, event_type, file_id) VALUES (now(), %s, %s, %s)",
-                            event.getUser().getId(), event.getEventType(), event.getFile().getId()),
+                            event.getUser().getId(), event.getEventType().getId(), event.getFile().getId()),
                     Event.class).executeUpdate();
 
             transaction.commit();

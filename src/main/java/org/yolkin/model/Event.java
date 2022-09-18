@@ -20,7 +20,7 @@ public class Event {
     private User user;
 
     @Column(name = "event_type")
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private EventType eventType;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
