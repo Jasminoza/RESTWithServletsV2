@@ -12,7 +12,7 @@ public class HibernateFileRepositoryImpl implements FileRepository {
     @Override
     public List<File> getAll() {
         try (Session session = getSession()) {
-            return session.createQuery("From File", File.class).list();
+            return session.createQuery("select f From File f left join fetch f.events", File.class).list();
         }
     }
 

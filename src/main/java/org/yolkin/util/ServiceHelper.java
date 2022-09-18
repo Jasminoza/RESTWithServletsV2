@@ -5,6 +5,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.yolkin.model.Event;
+import org.yolkin.model.EventType;
 import org.yolkin.model.File;
 import org.yolkin.model.User;
 import org.yolkin.repository.EventRepository;
@@ -107,7 +108,6 @@ public class ServiceHelper {
         User user = new User();
         user.setName(usernameFromHeader);
         user = userRepository.create(user);
-        makeCreateUserEvent(user);
         resp.setStatus(SC_CREATED);
         return user;
     }
@@ -127,7 +127,6 @@ public class ServiceHelper {
     public User updateUser() {
         userFromRepo.setName(usernameFromHeader);
         User updatedUser = userRepository.update(userFromRepo);
-        makeUpdateUserEvent(updatedUser);
         resp.setStatus(SC_OK);
         return updatedUser;
     }
@@ -139,7 +138,6 @@ public class ServiceHelper {
     public void deleteUser() {
         userRepository.delete(idFromRequest);
         resp.setStatus(SC_NO_CONTENT);
-        makeDeleteUserEvent(userFromRepo);
     }
 
     public boolean fileServiceCreateRequestIsCorrect() throws IOException {
@@ -320,7 +318,7 @@ public class ServiceHelper {
                 Date date = new Date();
                 if (!fileItem.isFormField()) {
                     java.io.File realFile = saveFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
-                    file = saveNewFileToHDD(realFile, fileItem, date);
+                    file = saveNewFileToHDD(realFile, fileItem);
                 }
             }
         } catch (FileUploadException e) {
@@ -330,12 +328,11 @@ public class ServiceHelper {
         return file;
     }
 
-    private File saveNewFileToHDD(java.io.File realFile, FileItem fileItem, Date date) throws IOException {
+    private File saveNewFileToHDD(java.io.File realFile, FileItem fileItem) throws IOException {
         File file;
         try {
             File fileForDB = new File();
             fileForDB.setName(realFile.getName());
-            fileForDB.setDateOfUploading(date);
             fileForDB.setFilepath(realFile.getPath());
 
             java.io.File uploadingDirectory = new java.io.File(PATH_FOR_UPLOADING);
@@ -363,7 +360,7 @@ public class ServiceHelper {
                 Date date = new Date();
                 if (!fileItem.isFormField()) {
                     java.io.File realFile = saveFileFromRequest(fileItem, PATH_FOR_UPLOADING, date);
-                    file = updateFileOnHDD(realFile, fileItem, date);
+                    file = updateFileOnHDD(realFile, fileItem);
                 }
             }
         } catch (FileUploadException e) {
@@ -373,12 +370,11 @@ public class ServiceHelper {
         return file;
     }
 
-    private File updateFileOnHDD(java.io.File realFile, FileItem fileItem, Date date) throws IOException {
+    private File updateFileOnHDD(java.io.File realFile, FileItem fileItem) throws IOException {
         File file;
         try {
             File fileForDB = fileFromRepo;
             fileForDB.setName(realFile.getName());
-            fileForDB.setDateOfUploading(date);
             fileForDB.setFilepath(realFile.getPath());
 
             fileItem.write(realFile);
@@ -395,54 +391,28 @@ public class ServiceHelper {
 
     private void makeCreateFileEvent(File file) {
         Event event = new Event();
-        User user = userRepository.getById(userIdFromHeader);
-        event.setEvent(formFileEventText("INFO", user, file, "created"));
+        event.setUser(userFromRepo);
+        event.setDate(new Date());
+        event.setEventType(EventType.CREATED);
+        event.setFile(file);
         eventRepository.create(event);
     }
 
     private void makeUpdateFileEvent(File file) {
         Event event = new Event();
-        User user = userRepository.getById(userIdFromHeader);
-        event.setEvent(formFileEventText("INFO", user, file, "updated"));
+        event.setUser(userFromRepo);
+        event.setDate(new Date());
+        event.setEventType(EventType.UPDATED);
+        event.setFile(file);
         eventRepository.create(event);
     }
 
     private void makeDeleteFileEvent(File file) {
         Event event = new Event();
-        User user = userRepository.getById(userIdFromHeader);
-        event.setEvent(formFileEventText("INFO", user, file, "deleted"));
+        event.setUser(userFromRepo);
+        event.setDate(new Date());
+        event.setEventType(EventType.DELETED);
+        event.setFile(file);
         eventRepository.create(event);
-    }
-
-    private String formFileEventText(String status, User user, File file, String whatWasDone) {
-        return String.format(
-                "[ %s ] %s: User{id: %s, name: %s} %s File{id: %s, name: %s, filepath: %s, date of uploading: %s}",
-                new Date(), status, user.getId(), user.getName(), whatWasDone, file.getId(), file.getName(), file.getFilepath(), file.getDateOfUploading()
-        );
-    }
-
-    private void makeCreateUserEvent(User user) {
-        Event event = new Event();
-        event.setEvent(formUserEventText("INFO", user, "created"));
-        eventRepository.create(event);
-    }
-
-    private void makeUpdateUserEvent(User user) {
-        Event event = new Event();
-        event.setEvent(formUserEventText("INFO", user, "updated"));
-        eventRepository.create(event);
-    }
-
-    private void makeDeleteUserEvent(User user) {
-        Event event = new Event();
-        event.setEvent(formUserEventText("INFO", user, "deleted"));
-        eventRepository.create(event);
-    }
-
-    private String formUserEventText(String status, User user, String whatWasDone) {
-        return String.format(
-                "[ %s ] %s: User{id: %s, name: %s} %s",
-                new Date(), status, user.getId(), user.getName(), whatWasDone
-        );
     }
 }

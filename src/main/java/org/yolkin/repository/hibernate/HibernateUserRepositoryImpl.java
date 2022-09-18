@@ -12,7 +12,7 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getAll() {
         try (Session session = getSession()) {
-            return session.createQuery("From User", User.class).list();
+            return session.createQuery("select u From User u join fetch u.events", User.class).list();
         }
     }
 

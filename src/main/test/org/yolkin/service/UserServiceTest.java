@@ -59,7 +59,6 @@ public class UserServiceTest extends Mockito {
 
         assertEquals(getUsers(), usersFromService);
         verify(userRepository, times(1)).getAll();
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -75,7 +74,6 @@ public class UserServiceTest extends Mockito {
         assertEquals(userWithId, userFromService);
         verify(resp, times(1)).setStatus(SC_CREATED);
         verify(resp, never()).sendError(anyInt(), anyString());
-        verify(eventRepository, times(1)).create(any());
     }
 
     @Test
@@ -88,7 +86,6 @@ public class UserServiceTest extends Mockito {
         verify(req, times(1)).getHeader("username");
         verify(resp, times(1)).sendError(SC_BAD_REQUEST, "Header \"username\" can't be null");
         verify(userRepository, never()).create(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -101,7 +98,6 @@ public class UserServiceTest extends Mockito {
         assertEquals(getUserWithId(), userFromService);
         verify(userRepository, times(1)).getById(1L);
         verify(resp, never()).sendError(anyInt(), anyString());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -114,7 +110,6 @@ public class UserServiceTest extends Mockito {
         assertNull(userFromService);
         verify(userRepository, times(1)).getById(100L);
         verify(resp, times(1)).sendError(SC_NOT_FOUND, "There is no user with such id");
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -126,7 +121,6 @@ public class UserServiceTest extends Mockito {
         assertNull(userFromService);
         verify(userRepository, never()).getById(any());
         verify(resp, times(1)).sendError(SC_BAD_REQUEST, "Incorrect id");
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -139,7 +133,6 @@ public class UserServiceTest extends Mockito {
         verify(resp).sendError(SC_BAD_REQUEST, "Id can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -153,7 +146,6 @@ public class UserServiceTest extends Mockito {
         verify(resp).sendError(SC_BAD_REQUEST, "Header \"username\" can't be null");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -168,7 +160,6 @@ public class UserServiceTest extends Mockito {
         verify(resp).sendError(SC_NOT_FOUND, "There is no user with such id");
         verify(userRepository, times(1)).getById(100L);
         verify(userRepository, never()).update(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -180,7 +171,6 @@ public class UserServiceTest extends Mockito {
         verify(resp).sendError(SC_BAD_REQUEST, "Incorrect id");
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -201,7 +191,6 @@ public class UserServiceTest extends Mockito {
         verify(resp, never()).sendError(anyInt(), anyString());
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).update(userAfterUpdate);
-        verify(eventRepository, times(1)).create(any());
     }
 
     @Test
@@ -214,7 +203,6 @@ public class UserServiceTest extends Mockito {
         verify(resp, never()).setStatus(SC_NO_CONTENT);
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).delete(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -228,7 +216,6 @@ public class UserServiceTest extends Mockito {
         verify(resp, never()).setStatus(SC_NO_CONTENT);
         verify(userRepository, times(1)).getById(100L);
         verify(userRepository, never()).delete(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -241,7 +228,6 @@ public class UserServiceTest extends Mockito {
         verify(resp, never()).setStatus(SC_NO_CONTENT);
         verify(userRepository, never()).getById(any());
         verify(userRepository, never()).update(any());
-        verify(eventRepository, never()).create(any());
     }
 
     @Test
@@ -254,7 +240,6 @@ public class UserServiceTest extends Mockito {
         verify(userRepository, times(1)).getById(1L);
         verify(userRepository, times(1)).delete(1L);
         verify(resp, times(1)).setStatus(SC_NO_CONTENT);
-        verify(eventRepository, times(1)).create(any());
     }
 
     private List<User> getUsers() {

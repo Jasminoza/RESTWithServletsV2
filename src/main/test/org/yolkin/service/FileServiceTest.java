@@ -296,28 +296,24 @@ public class FileServiceTest extends Mockito {
         file1.setId(1L);
         file1.setName("1.txt");
         file1.setFilepath("/storage/1.txt");
-        file1.setDateOfUploading(new Date(202201010213011L));
         files.add(file1);
 
         File file2 = new File();
         file1.setId(2L);
         file1.setName("2.txt");
         file1.setFilepath("/storage/2.txt");
-        file1.setDateOfUploading(new Date(20220101213012L));
         files.add(file2);
 
         File file3 = new File();
         file1.setId(3L);
         file1.setName("3.txt");
         file1.setFilepath("/storage/3.txt");
-        file1.setDateOfUploading(new Date(20220101213013L));
         files.add(file3);
 
         File file4 = new File();
         file1.setId(4L);
         file1.setName("4.txt");
         file1.setFilepath("/storage/4.txt");
-        file1.setDateOfUploading(new Date(20220101213014L));
         files.add(file4);
 
         return files;
@@ -327,7 +323,6 @@ public class FileServiceTest extends Mockito {
         File file1 = new File();
         file1.setName("1.txt");
         file1.setFilepath("/storage/1.txt");
-        file1.setDateOfUploading(new Date(202201010213011L));
         return file1;
     }
 
@@ -336,7 +331,6 @@ public class FileServiceTest extends Mockito {
         file1.setId(1L);
         file1.setName("1.txt");
         file1.setFilepath("/storage/1.txt");
-        file1.setDateOfUploading(new Date(202201010213011L));
         return file1;
     }
 

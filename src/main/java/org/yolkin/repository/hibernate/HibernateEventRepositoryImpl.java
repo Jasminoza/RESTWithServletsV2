@@ -12,7 +12,12 @@ public class HibernateEventRepositoryImpl implements EventRepository {
     @Override
     public List<Event> getAll() {
         try (Session session = getSession()) {
-            return session.createQuery("From Event", Event.class).list();
+            return session.createQuery(
+                    "select e From Event as e " +
+                            "join fetch e.file" +
+                            "join fetch e.user",
+                    Event.class
+            ).list();
         }
     }
 
