@@ -1,9 +1,10 @@
 package org.yolkin.model;
 
 public enum EventType {
-    CREATED(1),
-    UPDATED(2),
-    DELETED(3);
+    UNUSED  (0),
+    CREATED (1),
+    UPDATED (2),
+    DELETED (3);
 
     private final int id;
 
