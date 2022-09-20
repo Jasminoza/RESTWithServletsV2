@@ -1,25 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.yolkin</groupId>
   <artifactId>RESTWithServlets</artifactId>
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>RESTWithServlets Maven Webapp</name>
-  <url>http://maven.apache.org</url>
+  <url>https://maven.apache.org</url>
 
   <properties>
     <javax.servlet.api.version>4.0.1</javax.servlet.api.version>
     <tomcat.plugin.version>2.2</tomcat.plugin.version>
-    <flyway.version>9.2.2</flyway.version>
-    <typesafeConfig.version>1.2.0</typesafeConfig.version>
+    <flyway.version>9.3.0</flyway.version>
+    <typesafeConfig.version>1.4.2</typesafeConfig.version>
     <mysql.version>8.0.30</mysql.version>
     <fileuploads.version>1.4</fileuploads.version>
-    <hibernate.version>6.1.2.Final</hibernate.version>
-    <maven.plugin.version>3.10.1</maven.plugin.version>
+    <hibernate.version>6.1.3.Final</hibernate.version>
+    <maven.plugin.version>3.8.0</maven.plugin.version>
     <gson.version>2.9.1</gson.version>
     <junit.verion>5.9.0</junit.verion>
     <mockito.version>4.8.0</mockito.version>
+    <maven.war.plugin.verion>3.3.1</maven.war.plugin.verion>
+    <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
   </properties>
 
   <dependencies>
@@ -93,6 +95,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.plugin.version}</version>
         <configuration>
+          <release>11</release>
           <source>11</source>
           <target>11</target>
         </configuration>
@@ -106,6 +109,18 @@
           <path>/</path>
           <port>8088</port>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${maven.war.plugin.verion}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compiler.plugin.version}</version>
       </plugin>
 
     </plugins>

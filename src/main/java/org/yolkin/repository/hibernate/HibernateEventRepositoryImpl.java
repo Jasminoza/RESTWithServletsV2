@@ -29,12 +29,13 @@ public class HibernateEventRepositoryImpl implements EventRepository {
     @Override
     public Event getById(Long id) {
         try (Session session = getSession()) {
-            return session.createQuery(
-                    "select e From Event as e " +
+            List<Event> events = session.createQuery(
+                    "select e From Event as e" +
                             " OUTER join fetch e.file and " +
                             " OUTER join fetch e.user where e.id=" + id,
                     Event.class
-            ).list().get(0);
+            ).list();
+            return ( (events.size() == 0) ? null : events.get(0));
         }
     }
 

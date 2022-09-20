@@ -1,7 +1,11 @@
 package org.yolkin.service;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -13,12 +17,12 @@ import org.yolkin.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +40,12 @@ public class FileServiceTest extends Mockito {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+    @Mock
+    private Iterator<FileItem> iterator;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private ServletFileUpload uploader;
+    @Mock
+    private FilterInputStream is;
     private StringWriter writer;
     private PrintWriter printWriter;
     private FileService serviceUnderTest;
@@ -68,12 +78,16 @@ public class FileServiceTest extends Mockito {
     }
 
     @Test
-    public void createFileSuccess() throws IOException {
-        //::TODO
+    public void createFileSuccess() throws IOException, FileUploadException {
 
         when(request.getHeader("user_id")).thenReturn("1");
+        when(request.getContentType()).thenReturn("multipart/form-data");
         when(userRepository.getById(1L)).thenReturn(getUsers().get(0));
         when(fileRepository.create(getFileWithoutId())).thenReturn(getFileWithId());
+
+        when(uploader.parseRequest(request).iterator()).thenReturn(iterator);
+        doReturn(iterator).when(uploader).parseRequest(request).iterator();
+        when(iterator.hasNext()).thenReturn(true, false);
 
         File fileFromService = serviceUnderTest.create(request, response);
 

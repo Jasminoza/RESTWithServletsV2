@@ -1,17 +1,17 @@
 package org.yolkin.model;
 
 public enum EventType {
-    CREATED(1L),
-    UPDATED(2L),
-    DELETED(3L);
+    CREATED(1),
+    UPDATED(2),
+    DELETED(3);
 
-    private final Long id;
+    private final int id;
 
-    EventType(Long id) {
+    EventType(int id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 }
