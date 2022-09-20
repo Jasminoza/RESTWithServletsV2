@@ -16,7 +16,7 @@ public class User {
     private String name;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Event> events;
+    private transient List<Event> events;
 
     public User() {
     }
@@ -56,5 +56,13 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

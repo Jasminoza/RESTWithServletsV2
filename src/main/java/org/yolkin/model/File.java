@@ -20,7 +20,7 @@ public class File {
     private String filepath;
 
     @OneToMany(mappedBy = "file", fetch = FetchType.LAZY)
-    private List<Event> events;
+    private transient List<Event> events;
 
     public File() {
     }
