@@ -1,5 +1,8 @@
 package org.yolkin.service;
 
+import org.yolkin.dto.FileDTO;
+import org.yolkin.dto.mapper.FileMapper;
+import org.yolkin.model.EventEntity;
 import org.yolkin.model.FileEntity;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileService {
     private final FileRepository fileRepository;
@@ -37,7 +41,7 @@ public class FileService {
         return fileRepository.getAll();
     }
 
-    public FileEntity create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public FileEntity create(HttpServletRequest req, HttpServletResponse resp) {
 //        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 //
 //        if (helper.fileServiceCreateRequestIsCorrect()) {
@@ -47,17 +51,24 @@ public class FileService {
 //        }
     }
 
-    public FileEntity getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-//        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, req, resp, mappingUrl);
-//
-//        if (helper.fileServiceGetByIdRequestIsCorrect()) {
-//            return helper.getFileById();
-//        } else {
+    public FileDTO getById(Long id) {
+        FileEntity fileFromRepo = fileRepository.getById(id);
+
+        if (fileFromRepo == null) {
             return null;
-//        }
+        }
+
+        List<EventEntity> events = eventRepository.getAll().stream()
+                .filter((event -> event.getFile().equals(fileFromRepo)))
+                .collect(Collectors.toList());
+
+        FileDTO fileDTO = FileMapper.toFileDTO(fileFromRepo);
+        fileDTO.setEvents(events);
+
+        return fileDTO;
     }
 
-    public FileEntity update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+    public FileEntity update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
 //        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE, mappingUrl);
 //
 //        if (helper.fileServiceUpdateRequestIsCorrect()) {
@@ -67,7 +78,7 @@ public class FileService {
 //        }
 }
 
-    public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+    public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) {
 //        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, mappingUrl);
 //
 //        if (helper.fileServiceDeleteRequestIsCorrect()) {
