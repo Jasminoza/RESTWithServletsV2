@@ -2,7 +2,7 @@ package org.yolkin.repository.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.yolkin.model.User;
+import org.yolkin.model.UserEntity;
 import org.yolkin.repository.UserRepository;
 import org.yolkin.util.HibernateSessionFactoryUtil;
 
@@ -10,27 +10,27 @@ import java.util.List;
 
 public class HibernateUserRepositoryImpl implements UserRepository {
     @Override
-    public List<User> getAll() {
+    public List<UserEntity> getAll() {
         try (Session session = getSession()) {
-            return session.createQuery("From User", User.class).list();
+            return session.createQuery("select u from UserEntity u left join fetch u.events", UserEntity.class).list();
         }
     }
 
     @Override
-    public User create(User user) {
-        return saveUserToDB(user);
+    public UserEntity create(UserEntity userEntity) {
+        return saveUserToDB(userEntity);
     }
 
     @Override
-    public User getById(Long id) {
+    public UserEntity getById(Long id) {
         try (Session session = getSession()) {
-            return session.get(User.class, id);
+            return session.get(UserEntity.class, id);
         }
     }
 
     @Override
-    public User update(User user) {
-        return saveUserToDB(user);
+    public UserEntity update(UserEntity userEntity) {
+        return saveUserToDB(userEntity);
     }
 
     @Override
@@ -48,12 +48,12 @@ public class HibernateUserRepositoryImpl implements UserRepository {
         }
     }
 
-    private User saveUserToDB(User user) {
+    private UserEntity saveUserToDB(UserEntity userEntity) {
         Transaction transaction = null;
 
         try (Session session = getSession()) {
             transaction = session.beginTransaction();
-            user = session.merge(user);
+            userEntity = session.merge(userEntity);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -61,7 +61,7 @@ public class HibernateUserRepositoryImpl implements UserRepository {
             }
         }
 
-        return ((user.getId() != null) ? user : null);
+        return ((userEntity.getId() != null) ? userEntity : null);
     }
 
     private Session getSession() {

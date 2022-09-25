@@ -1,6 +1,6 @@
 package org.yolkin.repository;
 
-import org.yolkin.model.User;
+import org.yolkin.model.UserEntity;
 
-public interface UserRepository extends GenericRepository<User, Long> {
+public interface UserRepository extends GenericRepository<UserEntity, Long> {
 }

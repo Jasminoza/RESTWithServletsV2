@@ -1,13 +1,11 @@
 package org.yolkin.service;
 
-import org.yolkin.model.Event;
+import org.yolkin.dto.EventDTO;
+import org.yolkin.model.EventEntity;
+import org.yolkin.model.UserEntity;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
-import org.yolkin.util.ServiceHelper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 public class EventService {
@@ -22,25 +20,23 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
-    public List<Event> getAll() {
+    public List<EventEntity> getAll() {
         return eventRepository.getAll();
     }
 
-    public Event getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, req, resp, mappingUrl);
+    public EventDTO getById(Long id) {
+        EventEntity event = eventRepository.getById(id);
 
-        if (helper.eventServiceGetByIdRequestIsCorrect()) {
-            return helper.getEventById();
-        } else {
+        if (event == null) {
             return null;
         }
+        //TODO::
+        EventDTO eventDTO = new EventDTO(id);
+
+        return eventDTO;
     }
 
-    public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, req, resp, mappingUrl);
-
-        if (helper.eventServiceDeleteRequestIsCorrect()) {
-            helper.deleteEvent();
-        }
+    public void delete(Long id) {
+        eventRepository.delete(id);
     }
 }

@@ -1,13 +1,12 @@
 package org.yolkin.service;
 
-import org.yolkin.model.File;
+import org.yolkin.model.FileEntity;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
 import org.yolkin.repository.UserRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateFileRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
-import org.yolkin.util.ServiceHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,45 +33,45 @@ public class FileService {
         this.eventRepository = eventRepository;
     }
 
-    public List<File> getAll() {
+    public List<FileEntity> getAll() {
         return fileRepository.getAll();
     }
 
-    public File create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
-
-        if (helper.fileServiceCreateRequestIsCorrect()) {
-            return helper.createFile();
-        } else {
+    public FileEntity create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+//        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
+//
+//        if (helper.fileServiceCreateRequestIsCorrect()) {
+//            return helper.createFile();
+//        } else {
             return null;
-        }
+//        }
     }
 
-    public File getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, req, resp, mappingUrl);
-
-        if (helper.fileServiceGetByIdRequestIsCorrect()) {
-            return helper.getFileById();
-        } else {
+    public FileEntity getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+//        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, req, resp, mappingUrl);
+//
+//        if (helper.fileServiceGetByIdRequestIsCorrect()) {
+//            return helper.getFileById();
+//        } else {
             return null;
-        }
+//        }
     }
 
-    public File update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE, mappingUrl);
-
-        if (helper.fileServiceUpdateRequestIsCorrect()) {
-            return helper.updateFile();
-        } else {
+    public FileEntity update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
+//        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE, mappingUrl);
+//
+//        if (helper.fileServiceUpdateRequestIsCorrect()) {
+//            return helper.updateFile();
+//        } else {
             return null;
-        }
+//        }
 }
 
     public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, mappingUrl);
-
-        if (helper.fileServiceDeleteRequestIsCorrect()) {
-            helper.deleteFile();
-        }
+//        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, mappingUrl);
+//
+//        if (helper.fileServiceDeleteRequestIsCorrect()) {
+//            helper.deleteFile();
+//        }
     }
 }

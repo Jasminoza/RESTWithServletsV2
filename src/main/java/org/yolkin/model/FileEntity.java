@@ -2,15 +2,14 @@ package org.yolkin.model;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "files")
-public class File {
+public class FileEntity {
     @Id
-    @GeneratedValue(generator = "increment")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name")
@@ -20,9 +19,9 @@ public class File {
     private String filepath;
 
     @OneToMany(mappedBy = "file", fetch = FetchType.LAZY)
-    private transient List<Event> events;
+    private List<EventEntity> events;
 
-    public File() {
+    public FileEntity() {
     }
 
     public Long getId() {
@@ -49,20 +48,20 @@ public class File {
         this.filepath = filepath;
     }
 
-    public List<Event> getEvents() {
+    public List<EventEntity> getEvents() {
         return events;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setEvents(List<EventEntity> eventEntities) {
+        this.events = eventEntities;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        File file = (File) o;
-        return Objects.equals(id, file.id) && Objects.equals(name, file.name) && Objects.equals(filepath, file.filepath);
+        FileEntity fileEntity = (FileEntity) o;
+        return Objects.equals(id, fileEntity.id) && Objects.equals(name, fileEntity.name) && Objects.equals(filepath, fileEntity.filepath);
     }
 
     @Override

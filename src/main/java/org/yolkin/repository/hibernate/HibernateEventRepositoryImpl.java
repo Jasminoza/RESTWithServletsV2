@@ -2,7 +2,7 @@ package org.yolkin.repository.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.yolkin.model.Event;
+import org.yolkin.model.EventEntity;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.util.HibernateSessionFactoryUtil;
 
@@ -10,34 +10,32 @@ import java.util.List;
 
 public class HibernateEventRepositoryImpl implements EventRepository {
     @Override
-    public List<Event> getAll() {
+    public List<EventEntity> getAll() {
         try (Session session = getSession()) {
-            return session.createQuery(
-                    "select e From Event as e join fetch e.user join fetch e.file",
-                    Event.class
-            ).list();
+            return session.createQuery("select e From EventEntity e left join fetch e.user left join fetch e.file", EventEntity.class).list();
         }
     }
 
     @Override
-    public Event create(Event event) {
-        return saveEventToDB(event);
+    public EventEntity create(EventEntity eventEntity) {
+        return saveEventToDB(eventEntity);
     }
 
     @Override
-    public Event getById(Long id) {
+    public EventEntity getById(Long id) {
         try (Session session = getSession()) {
-            List<Event> events = session.createQuery(
-                    "select e From Event as e join fetch e.user join fetch e.file where e.id=" + id,
-                    Event.class
+            List<EventEntity> eventEntities = session.createQuery(
+                    "select e From EventEntity as e join fetch e.user join fetch e.file where e.id=" + id,
+                    EventEntity.class
             ).list();
-            return ( (events.size() == 0) ? null : events.get(0));
+
+            return ((eventEntities.size() != 0) ? eventEntities.get(0) : null);
         }
     }
 
     @Override
-    public Event update(Event event) {
-        return saveEventToDB(event);
+    public EventEntity update(EventEntity eventEntity) {
+        return saveEventToDB(eventEntity);
     }
 
     @Override
@@ -55,7 +53,7 @@ public class HibernateEventRepositoryImpl implements EventRepository {
         }
     }
 
-    private Event saveEventToDB(Event event) {
+    private EventEntity saveEventToDB(EventEntity eventEntity) {
         Transaction transaction = null;
 
         try (Session session = getSession()) {
@@ -66,8 +64,8 @@ public class HibernateEventRepositoryImpl implements EventRepository {
                     String.format(
                             "INSERT INTO events " +
                                     "(date, user_id, event_type, file_id) VALUES (now(), %s, %s, %s)",
-                            event.getUser().getId(), event.getEventType().getId(), event.getFile().getId()),
-                    Event.class).executeUpdate();
+                            eventEntity.getUser().getId(), eventEntity.getEventType(), eventEntity.getFile().getId()),
+                    EventEntity.class).executeUpdate();
 
             transaction.commit();
         } catch (Exception e) {
@@ -76,7 +74,7 @@ public class HibernateEventRepositoryImpl implements EventRepository {
             }
         }
 
-        return ((event.getId() != null) ? event : null);
+        return ((eventEntity.getId() != null) ? eventEntity : null);
     }
 
     private Session getSession() {

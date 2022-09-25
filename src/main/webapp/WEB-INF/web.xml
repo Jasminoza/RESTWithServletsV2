@@ -7,17 +7,17 @@
 
   <servlet>
     <servlet-name>Users</servlet-name>
-    <servlet-class>org.yolkin.rest.UserRestControllerV1</servlet-class>
+    <servlet-class>org.yolkin.rest.UsersRestControllerV1</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>Files</servlet-name>
-    <servlet-class>org.yolkin.rest.FileRestControllerV1</servlet-class>
+    <servlet-class>org.yolkin.rest.FilesRestControllerV1</servlet-class>
   </servlet>
 
   <servlet>
     <servlet-name>Events</servlet-name>
-    <servlet-class>org.yolkin.rest.EventRestControllerV1</servlet-class>
+    <servlet-class>org.yolkin.rest.EventsRestControllerV1</servlet-class>
   </servlet>
 
 <!--  ========================================================================================================  -->
@@ -29,12 +29,12 @@
 
   <servlet-mapping>
     <servlet-name>Files</servlet-name>
-    <url-pattern>/api/v1/files/*</url-pattern>
+    <url-pattern>/api/v1/fileEntities/*</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
     <servlet-name>Events</servlet-name>
-    <url-pattern>/api/v1/events/*</url-pattern>
+    <url-pattern>/api/v1/eventEntities/*</url-pattern>
   </servlet-mapping>
 
 </web-app>

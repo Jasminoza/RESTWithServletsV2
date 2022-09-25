@@ -7,9 +7,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "events")
-public class Event {
+public class EventEntity {
     @Id
-    @GeneratedValue(generator = "increment")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "date")
@@ -17,17 +17,17 @@ public class Event {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @Column(name = "event_type")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private EventType eventType;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
-    private File file;
+    private FileEntity file;
 
-    public Event() {
+    public EventEntity() {
     }
 
     public Long getId() {
@@ -46,12 +46,12 @@ public class Event {
         this.date = date;
     }
 
-    public User getUser() {
+    public UserEntity getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(UserEntity userEntity) {
+        this.user = userEntity;
     }
 
     public EventType getEventType() {
@@ -62,20 +62,20 @@ public class Event {
         this.eventType = eventType;
     }
 
-    public File getFile() {
+    public FileEntity getFile() {
         return file;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setFile(FileEntity fileEntity) {
+        this.file = fileEntity;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Event event = (Event) o;
-        return Objects.equals(id, event.id);
+        EventEntity eventEntity = (EventEntity) o;
+        return Objects.equals(id, eventEntity.id);
     }
 
     @Override

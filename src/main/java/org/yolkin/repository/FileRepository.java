@@ -1,6 +1,6 @@
 package org.yolkin.repository;
 
-import org.yolkin.model.File;
+import org.yolkin.model.FileEntity;
 
-public interface FileRepository extends GenericRepository<File, Long>{
+public interface FileRepository extends GenericRepository<FileEntity, Long>{
 }

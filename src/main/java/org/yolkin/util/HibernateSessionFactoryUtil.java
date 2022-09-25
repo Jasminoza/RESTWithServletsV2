@@ -3,9 +3,9 @@ package org.yolkin.util;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.yolkin.model.Event;
-import org.yolkin.model.File;
-import org.yolkin.model.User;
+import org.yolkin.model.EventEntity;
+import org.yolkin.model.FileEntity;
+import org.yolkin.model.UserEntity;
 
 public class HibernateSessionFactoryUtil {
     private static SessionFactory sessionFactory;
@@ -17,9 +17,9 @@ public class HibernateSessionFactoryUtil {
         if (sessionFactory == null) {
             try {
                 Configuration configuration = new Configuration().configure();
-                configuration.addAnnotatedClass(Event.class);
-                configuration.addAnnotatedClass(File.class);
-                configuration.addAnnotatedClass(User.class);
+                configuration.addAnnotatedClass(EventEntity.class);
+                configuration.addAnnotatedClass(FileEntity.class);
+                configuration.addAnnotatedClass(UserEntity.class);
 
                 StandardServiceRegistryBuilder builder =
                         new StandardServiceRegistryBuilder()

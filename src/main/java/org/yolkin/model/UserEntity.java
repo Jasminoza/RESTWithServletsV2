@@ -7,18 +7,18 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
     @Id
-    @GeneratedValue(generator = "increment")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private transient List<Event> events;
+    private List<EventEntity> events;
 
-    public User() {
+    public UserEntity() {
     }
 
     public Long getId() {
@@ -37,20 +37,20 @@ public class User {
         this.name = name;
     }
 
-    public List<Event> getEvents() {
+    public List<EventEntity> getEvents() {
         return events;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
+    public void setEvents(List<EventEntity> eventEntities) {
+        this.events = eventEntities;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name);
+        UserEntity userEntity = (UserEntity) o;
+        return Objects.equals(id, userEntity.id) && Objects.equals(name, userEntity.name);
     }
 
     @Override

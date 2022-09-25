@@ -1,16 +1,16 @@
 package org.yolkin.service;
 
-import org.yolkin.model.User;
+import org.yolkin.dto.UserDTO;
+import org.yolkin.dto.mapper.UserMapper;
+import org.yolkin.model.EventEntity;
+import org.yolkin.model.UserEntity;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.UserRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
-import org.yolkin.util.ServiceHelper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserService {
     private final UserRepository userRepository;
@@ -26,45 +26,47 @@ public class UserService {
         this.eventRepository = eventRepository;
     }
 
-    public List<User> getAll() {
+    public List<UserEntity> getAll() {
         return userRepository.getAll();
     }
 
-    public User create(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp);
+    public UserDTO create(UserEntity userWithoutId) {
+        UserDTO userDTO = UserMapper.toUserDto(userWithoutId);
 
-        if (helper.userServiceCreateRequestIsCorrect()) {
-            return helper.createUser();
-        } else {
-            return null;
-        }
+        UserEntity userWithId = userRepository.create(userWithoutId);
+        userDTO.setId(userWithId.getId());
+
+        return userDTO;
     }
 
-    public User getById(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, mappingUrl);
+    public UserDTO getById(Long id) {
+        UserEntity userFromRepo = userRepository.getById(id);
 
-        if (helper.userServiceGetByIdRequestIsCorrect()) {
-            return helper.getUserById();
-        } else {
+        if (userFromRepo == null) {
             return null;
         }
+
+        List<EventEntity> events = eventRepository.getAll().stream()
+                .filter((event -> event.getUser().equals(userFromRepo)))
+                .collect(Collectors.toList());
+
+        UserDTO userDTO = UserMapper.toUserDto(userFromRepo);
+        userDTO.setEvents(events);
+
+        return userDTO;
     }
 
-    public User update(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, mappingUrl);
+    public UserDTO update(UserEntity userForUpdate) {
+        UserDTO userDTO = UserMapper.toUserDto(userRepository.update(userForUpdate));
 
-        if(helper.userServiceUpdateRequestIsCorrect()) {
-            return helper.updateUser();
-        } else {
-            return null;
+        if (userDTO.getName().equals(userForUpdate.getName())) {
+            return userDTO;
         }
+
+        return null;
     }
 
-    public void delete(HttpServletRequest req, HttpServletResponse resp, String mappingUrl) throws IOException {
-        ServiceHelper helper = new ServiceHelper(eventRepository, userRepository, req, resp, mappingUrl);
-
-        if (helper.userServiceDeleteRequestIsCorrect()) {
-           helper.deleteUser();
-        }
+    public void delete(Long id) {
+        userRepository.delete(id);
     }
 }
