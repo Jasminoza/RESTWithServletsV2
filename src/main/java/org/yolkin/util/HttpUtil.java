@@ -36,5 +36,15 @@ public class HttpUtil {
         return true;
     }
 
+    public static boolean headerUserIdIsCorrect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String userIdStr = req.getHeader("user_id");
 
+        try {
+            Long.valueOf(userIdStr);
+            return true;
+        } catch (NumberFormatException e) {
+            resp.sendError(SC_BAD_REQUEST, "Header \"user_id\" contains incorrect value");
+            return false;
+        }
+    }
 }

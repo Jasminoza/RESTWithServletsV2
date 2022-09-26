@@ -16,7 +16,7 @@ public class FileEntity {
     private String name;
 
     @Column(name = "file_path")
-    private String filepath;
+    private String filePath;
 
     @OneToMany(mappedBy = "file", fetch = FetchType.LAZY)
     private List<EventEntity> events;
@@ -40,12 +40,12 @@ public class FileEntity {
         this.name = name;
     }
 
-    public String getFilepath() {
-        return filepath;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
+    public void setFilePath(String filepath) {
+        this.filePath = filepath;
     }
 
     public List<EventEntity> getEvents() {
@@ -61,11 +61,11 @@ public class FileEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FileEntity fileEntity = (FileEntity) o;
-        return Objects.equals(id, fileEntity.id) && Objects.equals(name, fileEntity.name) && Objects.equals(filepath, fileEntity.filepath);
+        return Objects.equals(id, fileEntity.id) && Objects.equals(name, fileEntity.name) && Objects.equals(filePath, fileEntity.filePath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, filepath);
+        return Objects.hash(id, name, filePath);
     }
 }

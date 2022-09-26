@@ -8,19 +8,19 @@ public class FileMapper {
     public static FileEntity toFile(FileCreationDTO fileCreationDTO) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setName(fileCreationDTO.getName());
-        fileEntity.setFilepath(fileCreationDTO.getFilePath());
+        fileEntity.setFilePath(fileCreationDTO.getFilePath());
         return fileEntity;
     }
 
     public static FileDTO toFileDTO(FileEntity fileEntity) {
-        return new FileDTO(fileEntity.getId(), fileEntity.getName(), fileEntity.getFilepath(), fileEntity.getEvents());
+        return new FileDTO(fileEntity.getId(), fileEntity.getName(), fileEntity.getFilePath(), fileEntity.getEvents());
     }
 
     public static FileEntity toFile(FileDTO fileDTO) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setId(fileDTO.getId());
         fileEntity.setName(fileDTO.getName());
-        fileEntity.setFilepath(fileDTO.getFilePath());
+        fileEntity.setFilePath(fileDTO.getFilePath());
         fileEntity.setEvents(fileDTO.getEvents());
         return fileEntity;
     }

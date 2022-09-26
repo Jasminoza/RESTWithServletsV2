@@ -1,5 +1,6 @@
 package org.yolkin.service;
 
+import org.yolkin.dto.FileCreationDTO;
 import org.yolkin.dto.FileDTO;
 import org.yolkin.dto.mapper.FileMapper;
 import org.yolkin.model.EventEntity;
@@ -41,7 +42,7 @@ public class FileService {
         return fileRepository.getAll();
     }
 
-    public FileEntity create(HttpServletRequest req, HttpServletResponse resp) {
+    public FileDTO create(FileEntity fileEntity) {
 //        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
 //
 //        if (helper.fileServiceCreateRequestIsCorrect()) {

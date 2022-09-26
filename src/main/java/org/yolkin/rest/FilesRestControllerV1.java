@@ -1,26 +1,45 @@
 package org.yolkin.rest;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.yolkin.dto.FileCreationDTO;
 import org.yolkin.dto.FileDTO;
+import org.yolkin.dto.UserDTO;
+import org.yolkin.dto.mapper.FileMapper;
+import org.yolkin.dto.mapper.UserMapper;
+import org.yolkin.model.FileEntity;
+import org.yolkin.model.UserEntity;
 import org.yolkin.service.FileService;
+import org.yolkin.service.UserService;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
+import java.util.Iterator;
 
-import static org.yolkin.util.HttpUtil.idFromUrlIsCorrect;
-import static org.yolkin.util.HttpUtil.sendJsonFrom;
+import static javax.servlet.http.HttpServletResponse.*;
+import static org.yolkin.util.HttpUtil.*;
 
 public class FilesRestControllerV1 extends HttpServlet {
     private final FileService fileService;
+    private final UserService userService;
     private final String mappingUrl = "/api/v1/files/";
+    String PATH_FOR_UPLOADING = "src/main/webapp/uploads";
+    int MAX_MEMORY_SIZE = 100 * 1024;
+    int MAX_FILE_SIZE = 100 * 1024;
 
     public FilesRestControllerV1() {
-        fileService = new FileService();
+        this.fileService = new FileService();
+        this.userService = new UserService();
     }
 
-    public FilesRestControllerV1(FileService fileService) {
+    public FilesRestControllerV1(FileService fileService, UserService userService) {
         this.fileService = fileService;
+        this.userService = userService;
     }
 
     @Override
@@ -34,7 +53,7 @@ public class FilesRestControllerV1 extends HttpServlet {
             if (idFromUrlIsCorrect(id, resp)) {
                 FileDTO fileDTO = fileService.getById(Long.valueOf(id));
                 if (fileDTO == null) {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "There is no File with such id");
+                    resp.sendError(SC_NOT_FOUND, "There is no File with such id");
                 }  else {
                     sendJsonFrom(resp, fileDTO);
                 }
@@ -44,8 +63,34 @@ public class FilesRestControllerV1 extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-//        HttpUtil helper = new HttpUtil(resp);
-//        helper.sendJsonFrom(fileService.create(req, resp));
+        String headerName = "user_id";
+
+        if (headerIsNotBlank(headerName, req, resp)) {
+            if (headerUserIdIsCorrect(req, resp)) {
+                Long userIdFromHeader = Long.valueOf(req.getHeader(headerName));
+                UserDTO userDTO = userService.getById(userIdFromHeader);
+
+                if (userDTO == null) {
+                    resp.sendError(SC_NOT_FOUND, "There is no User with such id");
+                    return;
+                }
+
+                ServletFileUpload uploader = setupUploader(PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
+                FileCreationDTO fileCreationDTO = getFileEntityFromRequest(uploader, req, resp);
+
+                if (fileCreationDTO == null) {
+                    return;
+                }
+
+                UserEntity user = UserMapper.toUser(userDTO);
+                fileCreationDTO.setUser(user);
+
+                FileEntity fileEntity = FileMapper.toFile(fileCreationDTO);
+                
+                sendJsonFrom(resp, fileService.create(fileEntity));
+                resp.setStatus(SC_CREATED);
+            }
+        }
     }
 
     @Override
@@ -57,5 +102,43 @@ public class FilesRestControllerV1 extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 //        fileService.delete(req, resp, mappingUrl);
+    }
+
+    private ServletFileUpload setupUploader(String PATH_FOR_UPLOADING, int MAX_MEMORY_SIZE, int MAX_FILE_SIZE) {
+        DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
+        diskFileItemFactory.setRepository(new java.io.File(PATH_FOR_UPLOADING));
+        diskFileItemFactory.setSizeThreshold(MAX_MEMORY_SIZE);
+
+        ServletFileUpload uploader = new ServletFileUpload(diskFileItemFactory);
+        uploader.setSizeMax(MAX_FILE_SIZE);
+        uploader.setFileSizeMax(MAX_MEMORY_SIZE);
+        return uploader;
+    }
+
+    private FileCreationDTO getFileEntityFromRequest(ServletFileUpload uploader, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        FileCreationDTO fileCreationDTO = null;
+        try {
+            Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
+            if (iterator.hasNext()) {
+                FileItem fileItem = iterator.next();
+                String fileName = fileItem.getName();
+                String filePath;
+
+                if (fileName.lastIndexOf("\\") >= 0) {
+                    filePath = PATH_FOR_UPLOADING + java.io.File.separator + new Date() + " " +
+                            fileName.substring(fileName.lastIndexOf("\\"));
+                } else {
+                    filePath = PATH_FOR_UPLOADING + java.io.File.separator + new Date() + " " +
+                            fileName.substring(fileName.lastIndexOf("\\") + 1);
+                }
+                
+                fileCreationDTO.setName(fileName);
+                fileCreationDTO.setFilePath(filePath);
+            }
+        } catch (FileUploadException e) {
+            resp.sendError(SC_NOT_ACCEPTABLE, "Can't upload file or size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
+            return null;
+        }
+        return fileCreationDTO;
     }
 }
