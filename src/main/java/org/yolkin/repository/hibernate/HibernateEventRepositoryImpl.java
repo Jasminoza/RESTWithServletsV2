@@ -63,7 +63,7 @@ public class HibernateEventRepositoryImpl implements EventRepository {
             session.createNativeQuery(
                     String.format(
                             "INSERT INTO events " +
-                                    "(date, user_id, event_type, file_id) VALUES (now(), %s, %s, %s)",
+                                    "(date, user_id, event_type, file_id) VALUES (now(), %s, '%s', %s)",
                             eventEntity.getUser().getId(), eventEntity.getEventType(), eventEntity.getFile().getId()),
                     EventEntity.class).executeUpdate();
 

@@ -7,9 +7,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.yolkin.dto.FileCreationDTO;
 import org.yolkin.dto.FileDTO;
 import org.yolkin.dto.UserDTO;
-import org.yolkin.dto.mapper.FileMapper;
 import org.yolkin.dto.mapper.UserMapper;
-import org.yolkin.model.FileEntity;
 import org.yolkin.model.UserEntity;
 import org.yolkin.service.FileService;
 import org.yolkin.service.UserService;
@@ -85,9 +83,14 @@ public class FilesRestControllerV1 extends HttpServlet {
                 UserEntity user = UserMapper.toUser(userDTO);
                 fileCreationDTO.setUser(user);
 
-                FileEntity fileEntity = FileMapper.toFile(fileCreationDTO);
-                
-                sendJsonFrom(resp, fileService.create(fileEntity));
+                FileDTO fileDTO = fileService.create(fileCreationDTO);
+
+                if (fileDTO == null) {
+                    resp.sendError(SC_NOT_IMPLEMENTED, "Can't save file");
+                    return;
+                }
+
+                sendJsonFrom(resp, fileDTO);
                 resp.setStatus(SC_CREATED);
             }
         }
@@ -116,29 +119,33 @@ public class FilesRestControllerV1 extends HttpServlet {
     }
 
     private FileCreationDTO getFileEntityFromRequest(ServletFileUpload uploader, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        FileCreationDTO fileCreationDTO = null;
+        FileCreationDTO fileCreationDTO = new FileCreationDTO();
         try {
             Iterator<FileItem> iterator = uploader.parseRequest(req).iterator();
             if (iterator.hasNext()) {
                 FileItem fileItem = iterator.next();
                 String fileName = fileItem.getName();
-                String filePath;
+                String filePath = getFilepathFromFile(fileName);
 
-                if (fileName.lastIndexOf("\\") >= 0) {
-                    filePath = PATH_FOR_UPLOADING + java.io.File.separator + new Date() + " " +
-                            fileName.substring(fileName.lastIndexOf("\\"));
-                } else {
-                    filePath = PATH_FOR_UPLOADING + java.io.File.separator + new Date() + " " +
-                            fileName.substring(fileName.lastIndexOf("\\") + 1);
-                }
-                
                 fileCreationDTO.setName(fileName);
                 fileCreationDTO.setFilePath(filePath);
+                fileCreationDTO.setFileItem(fileItem);
+                fileCreationDTO.setPathForUploading(PATH_FOR_UPLOADING);
             }
         } catch (FileUploadException e) {
             resp.sendError(SC_NOT_ACCEPTABLE, "Can't upload file or size of all files exceeds " + MAX_FILE_SIZE / 1024 + " kb.");
             return null;
         }
         return fileCreationDTO;
+    }
+
+    private String getFilepathFromFile(String fileName) {
+        if (fileName.lastIndexOf("\\") >= 0) {
+            return PATH_FOR_UPLOADING + java.io.File.separator + new Date() + " " +
+                    fileName.substring(fileName.lastIndexOf("\\"));
+        } else {
+            return PATH_FOR_UPLOADING + java.io.File.separator + new Date() + " " +
+                    fileName.substring(fileName.lastIndexOf("\\") + 1);
+        }
     }
 }

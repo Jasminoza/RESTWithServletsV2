@@ -7,34 +7,28 @@ import org.yolkin.model.EventEntity;
 import org.yolkin.model.FileEntity;
 import org.yolkin.repository.EventRepository;
 import org.yolkin.repository.FileRepository;
-import org.yolkin.repository.UserRepository;
 import org.yolkin.repository.hibernate.HibernateEventRepositoryImpl;
 import org.yolkin.repository.hibernate.HibernateFileRepositoryImpl;
-import org.yolkin.repository.hibernate.HibernateUserRepositoryImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.yolkin.util.EventMaker.makeCreateFileEvent;
+
 public class FileService {
     private final FileRepository fileRepository;
-    private final UserRepository userRepository;
     private final EventRepository eventRepository;
-    static final int MAX_FILE_SIZE = 100 * 1024;
-    static final int MAX_MEMORY_SIZE = 100 * 1024;
-    private final String PATH_FOR_UPLOADING = "src/main/webapp/uploads";
 
     public FileService() {
         fileRepository = new HibernateFileRepositoryImpl();
-        userRepository = new HibernateUserRepositoryImpl();
         eventRepository = new HibernateEventRepositoryImpl();
     }
 
-    public FileService(FileRepository fileRepository, UserRepository userRepository, EventRepository eventRepository) {
+    public FileService(FileRepository fileRepository, EventRepository eventRepository) {
         this.fileRepository = fileRepository;
-        this.userRepository = userRepository;
         this.eventRepository = eventRepository;
     }
 
@@ -42,14 +36,32 @@ public class FileService {
         return fileRepository.getAll();
     }
 
-    public FileDTO create(FileEntity fileEntity) {
-//        ServiceHelper helper = new ServiceHelper(eventRepository, fileRepository, userRepository, req, resp, PATH_FOR_UPLOADING, MAX_MEMORY_SIZE, MAX_FILE_SIZE);
-//
-//        if (helper.fileServiceCreateRequestIsCorrect()) {
-//            return helper.createFile();
-//        } else {
+    public FileDTO create(FileCreationDTO fileCreationDTO) {
+        FileEntity fileEntity = FileMapper.toFile(fileCreationDTO);
+
+        try {
+            File uploadingDirectory = new java.io.File(fileCreationDTO.getPathForUploading());
+            if (!uploadingDirectory.exists()) {
+                if (!uploadingDirectory.mkdir()) {
+                    return null;
+                }
+            }
+            fileCreationDTO.getFileItem().write(new File(fileCreationDTO.getFilePath()));
+        } catch (Exception e) {
             return null;
-//        }
+        }
+
+        FileEntity fileWithId = fileRepository.create(fileEntity);
+
+        if (fileWithId == null) {
+            fileCreationDTO.getFileItem().delete();
+            return null;
+        }
+
+        FileDTO fileDTO = FileMapper.toFileDTO(fileWithId);
+        makeCreateFileEvent(fileWithId, fileCreationDTO.getUser(), eventRepository);
+
+        return fileDTO;
     }
 
     public FileDTO getById(Long id) {
